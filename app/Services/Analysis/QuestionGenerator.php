@@ -137,8 +137,7 @@ class QuestionGenerator
             'market' => $country,
             'language' => Locale::getDisplayLanguage($language, $language) ?: $language,
         ];
-        $services = array_values(array_filter(array_map(fn ($s) => is_string($s) ? self::safe($s, $terms) : null, $inspection['services'] ?? [])));
-        $values['service'] = $services !== [] ? $services[$offset % count($services)] : $values['industry'];
+        $values['service'] = self::safe($industry, $terms) ?? self::scrapedService($inspection, $offset, $terms) ?? $values['industry'];
         $values['city'] = self::safe($inspection['city'] ?? null, $terms) ?? $country;
 
         $question = self::fill($pattern, $values);
@@ -174,6 +173,37 @@ class QuestionGenerator
     }
 
     /** @param  list<string>  $terms folded brand terms from brandTerms() */
+    /**
+     * Scraped headings/nav links are noisy ("tools", "works") and include the company's own product
+     * names, which would identify the brand. Only multi-word phrases sharing no stem with the brand qualify.
+     *
+     * @param  list<string>  $terms
+     */
+    private static function scrapedService(array $inspection, int $offset, array $terms): ?string
+    {
+        $stems = array_filter(array_map(fn ($t) => mb_substr(TextNormalizer::fold($t), 0, 5), $terms), fn ($s) => mb_strlen($s) >= 4);
+
+        $services = array_values(array_filter(
+            array_map(fn ($s) => is_string($s) ? self::safe($s, $terms) : null, $inspection['services'] ?? []),
+            function (?string $service) use ($stems): bool {
+                if ($service === null || count(preg_split('/\s+/u', $service)) < 2) {
+                    return false;
+                }
+                foreach (preg_split('/[^\p{L}\p{N}]+/u', TextNormalizer::fold($service), -1, PREG_SPLIT_NO_EMPTY) as $word) {
+                    foreach ($stems as $stem) {
+                        if (str_starts_with($word, $stem)) {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            },
+        ));
+
+        return $services === [] ? null : $services[$offset % count($services)];
+    }
+
     public static function leaks(string $text, array $terms): bool
     {
         $folded = TextNormalizer::fold($text);

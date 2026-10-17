@@ -81,9 +81,9 @@ class QuestionGeneratorTest extends TestCase
         $this->assertStringContainsString('in Romania', $texts[2]);            // {city} -> market
     }
 
-    public function test_uses_inspection_service_and_city_when_available(): void
+    public function test_uses_inspection_service_and_city_when_no_industry_given(): void
     {
-        $analysis = $this->analysis(['website_inspection' => ['fetched' => true, 'services' => ['ERP Development'], 'city' => 'Timisoara']]);
+        $analysis = $this->analysis(['industry' => null, 'website_inspection' => ['fetched' => true, 'services' => ['ERP Development'], 'city' => 'Timisoara']]);
 
         $texts = app(QuestionGenerator::class)->generate($analysis)->pluck('question')->implode(' | ');
 
@@ -161,5 +161,17 @@ class QuestionGeneratorTest extends TestCase
         foreach (app(QuestionGenerator::class)->generate($analysis) as $question) {
             $this->assertStringNotContainsStringIgnoringCase('zorbix', $question->question);
         }
+    }
+
+    public function test_scraped_services_skip_nav_noise_and_brand_products(): void
+    {
+        $inspection = ['services' => ['services', 'tools', 'works', 'Axionlab', 'Axionlab Studio', 'Web Development']];
+        $terms = ['Axiontic', 'axiontic.com'];
+
+        $question = QuestionGenerator::build('Which companies offer {service} in {market}?', 'en', 'RO', null, $inspection, 0, $terms);
+        $this->assertStringContainsString('Web Development', $question);
+
+        $withIndustry = QuestionGenerator::build('Which companies offer {service} in {market}?', 'en', 'RO', 'ERP software', $inspection, 0, $terms);
+        $this->assertStringContainsString('ERP software', $withIndustry);
     }
 }

@@ -26,14 +26,14 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done & integrated · `[!]` bloc
 - [x] B11 Tests
 
 ### Frontend (`frontend` branch)
-- [~] F1 Locale routing, browser detection, switcher, hreflang, 9 language files
-- [~] F2 Layout, design system (dark/light), SEO component, sitemap, robots
-- [~] F3 Landing page sections
-- [~] F4 Analysis form (Livewire) → AnalysisStarter
-- [~] F5 Results dashboard with live progress, provider cards, competitors, questions, CTAs, DEMO label
-- [~] F6 Lead form on results page + contact form, emails
-- [~] F7 Privacy / Terms / Cookie pages
-- [~] F8 Tests
+- [x] F1 Locale routing, browser detection, switcher, hreflang, 9 language files
+- [x] F2 Layout, design system (dark/light), SEO component, sitemap, robots
+- [x] F3 Landing page sections
+- [x] F4 Analysis form (Livewire) → AnalysisStarter
+- [x] F5 Results dashboard with live progress, provider cards, competitors, questions, CTAs, DEMO label
+- [x] F6 Lead form on results page + contact form, emails
+- [x] F7 Privacy / Terms / Cookie pages
+- [x] F8 Tests
 
 ### Admin (`admin` branch)
 - [x] A1 Panel setup, auth hardening (active admins only, rate limit), branding
@@ -50,8 +50,12 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done & integrated · `[!]` bloc
 - [x] A12 Tests
 
 ## Phase 1 integration (Lead)
-- [ ] Merge backend → frontend → admin, resolve conflicts, full test + build
-- [ ] End-to-end check in mock mode: submit → progress → results → lead → admin
+- [x] Merge admin → backend → frontend (no conflicts), full test + build (232 tests)
+- [x] End-to-end check in mock mode in a browser with a real queue worker: submit → results → lead + emails → admin
+- [x] Fix: website inspection failed on every live fetch (stream handler vs CURLOPT_RESOLVE)
+- [x] Fix: {service} used noisy scraped nav text and company product names; now industry first, filtered scrape fallback
+- [ ] Verify the 4 provider adapters against current official API docs, then one live smoke test per provider (needs API keys)
+- [ ] Run migrations + suite against PostgreSQL
 
 ## Phase 2 — Payments & reports (blocked until Phase 1 verified)
 - [ ] orders/payments/reports schema
