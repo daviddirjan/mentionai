@@ -13,17 +13,17 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done & integrated · `[!]` bloc
 ## Phase 1 — MVP core (parallel)
 
 ### Backend & AI (`backend` branch)
-- [~] B1 Provider adapters: OpenAI (Responses + web search), Gemini (Google Search grounding), Anthropic (Messages + web search tool), Perplexity (Sonar), Mock
-- [~] B2 DefaultProviderRegistry (mock/live mode, no silent fallback)
-- [~] B3 WebsiteInspector with SSRF protection
-- [~] B4 QuestionGenerator (templates, no company name, analysis language)
-- [~] B5 Pipeline jobs: RunAnalysis, QueryProvider (batch), FinalizeAnalysis; usage logs; budget checks
-- [~] B6 BrandDetector (4 classes + uncertain, evidence)
-- [~] B7 CompetitorExtractor (dedupe, frequency)
-- [~] B8 ScoreCalculator
-- [~] B9 DefaultAnalysisStarter (Turnstile, IP/domain limits, budget, cache reuse, dedupe)
-- [~] B10 DefaultAnalysisMaintenance (retry failed only, recalculate)
-- [~] B11 Tests
+- [x] B1 Provider adapters: OpenAI (Responses + web search), Gemini (Google Search grounding), Anthropic (Messages + web search tool), Perplexity (Sonar), Mock
+- [x] B2 DefaultProviderRegistry (mock/live mode, no silent fallback)
+- [x] B3 WebsiteInspector with SSRF protection
+- [x] B4 QuestionGenerator (templates, no company name, analysis language)
+- [x] B5 Pipeline jobs: RunAnalysis, QueryProvider (batch), FinalizeAnalysis; usage logs; budget checks
+- [x] B6 BrandDetector (4 classes + uncertain, evidence)
+- [x] B7 CompetitorExtractor (dedupe, frequency)
+- [x] B8 ScoreCalculator
+- [x] B9 DefaultAnalysisStarter (Turnstile, IP/domain limits, budget, cache reuse, dedupe)
+- [x] B10 DefaultAnalysisMaintenance (retry failed only, recalculate)
+- [x] B11 Tests
 
 ### Frontend (`frontend` branch)
 - [~] F1 Locale routing, browser detection, switcher, hreflang, 9 language files

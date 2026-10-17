@@ -30,6 +30,8 @@ class WebsiteInspector
         $config = config('mentionai.website_inspection');
         $deadline = microtime(true) + (float) $config['timeout_seconds'];
         $current = $url;
+        $maxBytes = (int) $config['max_bytes'];
+        $tooLarge = false;
 
         try {
             for ($hop = 0; $hop <= (int) $config['max_redirects']; $hop++) {
@@ -43,8 +45,14 @@ class WebsiteInspector
                     ->timeout((int) ceil($remaining))
                     ->withOptions([
                         'allow_redirects' => false,
-                        'stream' => true,
-                        'curl' => [CURLOPT_RESOLVE => ["{$target['host']}:{$target['port']}:{$target['ip']}"]],
+                        // Abort mid-transfer once the cap is passed; Content-Length may be absent or wrong.
+                        'progress' => function ($downloadTotal, $downloaded) use ($maxBytes, &$tooLarge): void {
+                            if ($downloaded > $maxBytes) {
+                                $tooLarge = true;
+                                throw new \RuntimeException('too_large');
+                            }
+                        },
+                        'curl' => [CURLOPT_RESOLVE => ["{$target['host']}:{$target['port']}:".(str_contains($target['ip'], ':') ? "[{$target['ip']}]" : $target['ip'])]],
                     ])
                     ->get($current);
 
@@ -68,13 +76,8 @@ class WebsiteInspector
                     return $this->failure($url, 'not_html');
                 }
 
-                $length = (int) $response->header('Content-Length');
-                if ($length > (int) $config['max_bytes']) {
-                    return $this->failure($url, 'too_large');
-                }
-
-                $body = $this->readBody($response->toPsrResponse()->getBody(), (int) $config['max_bytes'], $deadline);
-                if ($body === null) {
+                $body = $response->body();
+                if ((int) $response->header('Content-Length') > $maxBytes || strlen($body) > $maxBytes) {
                     return $this->failure($url, 'too_large');
                 }
 
@@ -85,7 +88,7 @@ class WebsiteInspector
         } catch (UnsafeUrl $e) {
             return $this->failure($url, 'unsafe_url');
         } catch (Throwable $e) {
-            return $this->failure($url, 'fetch_failed');
+            return $this->failure($url, $tooLarge ? 'too_large' : 'fetch_failed');
         }
     }
 
@@ -152,21 +155,6 @@ class WebsiteInspector
         return $origin.$dir.$location;
     }
 
-    private function readBody($stream, int $maxBytes, float $deadline): ?string
-    {
-        $body = '';
-        while (! $stream->eof()) {
-            $body .= $stream->read(8192);
-            if (strlen($body) > $maxBytes) {
-                return null;
-            }
-            if (microtime(true) > $deadline) {
-                throw new \RuntimeException('timeout');
-            }
-        }
-
-        return $body;
-    }
 
     /** @return array<string, mixed> */
     private function failure(string $url, string $error): array
