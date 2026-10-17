@@ -7,6 +7,7 @@ use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 
@@ -59,7 +60,7 @@ class AdminUsersTest extends AdminTestCase
             ->assertHasNoFormErrors();
 
         $this->assertFalse($other->refresh()->is_active);
-        $this->assertFalse($other->canAccessPanel(\Filament\Facades\Filament::getCurrentPanel()));
+        $this->assertFalse($other->canAccessPanel(Filament::getCurrentPanel()));
     }
 
     public function test_admin_cannot_deactivate_themselves(): void

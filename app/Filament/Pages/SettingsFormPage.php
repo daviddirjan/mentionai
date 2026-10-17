@@ -6,6 +6,7 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\EmbeddedSchema;
 use Filament\Schemas\Components\Form;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
@@ -20,7 +21,7 @@ abstract class SettingsFormPage extends Page implements HasSchemas
     /** @var array<string, mixed> */
     public ?array $data = [];
 
-    /** @return list<\Filament\Schemas\Components\Component> */
+    /** @return list<Component> */
     abstract protected function fields(): array;
 
     /** Setting keys edited by this page. */
