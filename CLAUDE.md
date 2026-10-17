@@ -51,6 +51,6 @@ Each area has exactly one owner. Do not edit files outside your area. If you nee
 | **Lead** (architect) | `CLAUDE.md`, `AGENTS.md`, `docs/**`, `README.md`, `composer.*`, `package*.json`, `vite.config.js`, `bootstrap/**`, `config/**`, `database/migrations/**`, `database/factories/**`, `database/seeders/{DatabaseSeeder,AiProviderSeeder,PromptTemplateSeeder}.php`, `app/Models/**`, `app/Enums/**`, `app/Contracts/**`, `app/Data/**`, `app/Support/**`, `app/Exceptions/**`, `app/Providers/AppServiceProvider.php`, `.env.example`, `phpunit.xml`, `tests/TestCase.php`, `tests/*/Foundation/**` |
 | **Frontend** | `routes/web.php`, `app/Livewire/**`, `app/Http/**`, `app/Mail/**`, `resources/views/**` (except `filament/`), `resources/css/**`, `resources/js/**`, `lang/**`, `public/**` (except `build/`), `tests/Feature/Frontend/**` |
 | **Backend & AI** | `app/Services/**`, `app/Jobs/**`, `app/Actions/**`, `routes/console.php`, `tests/Feature/Backend/**`, `tests/Unit/Backend/**` |
-| **Admin** | `app/Filament/**`, `app/Providers/Filament/**`, `resources/views/filament/**`, `database/seeders/DemoDataSeeder.php`, `tests/Feature/Admin/**` |
+| **Admin** | `app/Filament/**`, `app/Console/Commands/**`, `app/Providers/Filament/**`, `resources/views/filament/**`, `database/seeders/DemoDataSeeder.php`, `tests/Feature/Admin/**` |
 
 Schema/model/contract changes go through the lead. Never add Composer or npm packages yourself — request them.
