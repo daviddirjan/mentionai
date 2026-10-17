@@ -8,6 +8,9 @@ Laravel 13 · PHP 8.3+ · PostgreSQL (prod) / SQLite (local + tests) · database
 
 ## Commands
 ```sh
+# first-time local setup (SQLite)
+cp .env.example .env && sed -i '' -e 's/^DB_CONNECTION=pgsql/DB_CONNECTION=sqlite/' -e '/^DB_\(HOST\|PORT\|DATABASE\|USERNAME\|PASSWORD\)=/d' .env
+php artisan key:generate && touch database/database.sqlite
 php artisan migrate:fresh --seed   # local DB (database/database.sqlite)
 php artisan test                   # all tests (SQLite in-memory)
 php artisan test --filter=Name     # one test

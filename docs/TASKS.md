@@ -36,18 +36,18 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done & integrated · `[!]` bloc
 - [~] F8 Tests
 
 ### Admin (`admin` branch)
-- [~] A1 Panel setup, auth hardening (active admins only, rate limit), branding
-- [~] A2 Dashboard widgets
-- [~] A3 Analyses resource (filters, detail, raw responses, retry, recalculate, export, delete)
-- [~] A4 Leads resource (CRM statuses, notes, export)
-- [~] A5 Contact messages resource
-- [~] A6 AI providers resource (settings, test connection, key status)
-- [~] A7 API cost page + limits settings
-- [~] A8 Prompt templates resource
-- [~] A9 Website settings page
-- [~] A10 Admin users resource + `mentionai:create-admin` command
-- [~] A11 DemoDataSeeder
-- [~] A12 Tests
+- [x] A1 Panel setup, auth hardening (active admins only, rate limit), branding
+- [x] A2 Dashboard widgets
+- [x] A3 Analyses resource (filters, detail, raw responses, retry, recalculate, export, delete)
+- [x] A4 Leads resource (CRM statuses, notes, export)
+- [x] A5 Contact messages resource
+- [x] A6 AI providers resource (settings, test connection, key status)
+- [x] A7 API cost page + limits settings
+- [x] A8 Prompt templates resource
+- [x] A9 Website settings page
+- [x] A10 Admin users resource + `mentionai:create-admin` command
+- [x] A11 DemoDataSeeder
+- [x] A12 Tests
 
 ## Phase 1 integration (Lead)
 - [ ] Merge backend → frontend → admin, resolve conflicts, full test + build
