@@ -1,9 +1,165 @@
 @import 'tailwindcss';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../views';
+@source '../../app/Livewire';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* Semantic tokens. Dark is the default; [data-theme='light'] overrides. */
+:root {
+    color-scheme: dark;
+    --bg: #09090b;
+    --bg-soft: #0f0f13;
+    --surface: #131318;
+    --surface-2: #1a1a21;
+    --line: rgb(255 255 255 / 0.08);
+    --line-strong: rgb(255 255 255 / 0.16);
+    --fg: #fafafa;
+    --fg-muted: #a1a1aa;
+    --fg-subtle: #71717a;
+    --accent: #6d7cff;
+    --accent-2: #a279ff;
+    --accent-fg: #ffffff;
+    --good: #34d399;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    --glow: rgb(109 124 255 / 0.18);
+}
+
+[data-theme='light'] {
+    color-scheme: light;
+    --bg: #fafafa;
+    --bg-soft: #f4f4f6;
+    --surface: #ffffff;
+    --surface-2: #f4f4f6;
+    --line: rgb(9 9 11 / 0.09);
+    --line-strong: rgb(9 9 11 / 0.18);
+    --fg: #09090b;
+    --fg-muted: #52525b;
+    --fg-subtle: #71717a;
+    --accent: #4f5bf0;
+    --accent-2: #7c4dff;
+    --good: #059669;
+    --warn: #b45309;
+    --bad: #dc2626;
+    --glow: rgb(79 91 240 / 0.12);
+}
+
+@theme inline {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    --color-bg: var(--bg);
+    --color-bg-soft: var(--bg-soft);
+    --color-surface: var(--surface);
+    --color-surface-2: var(--surface-2);
+    --color-line: var(--line);
+    --color-line-strong: var(--line-strong);
+    --color-fg: var(--fg);
+    --color-muted: var(--fg-muted);
+    --color-subtle: var(--fg-subtle);
+    --color-accent: var(--accent);
+    --color-accent-2: var(--accent-2);
+    --color-good: var(--good);
+    --color-warn: var(--warn);
+    --color-bad: var(--bad);
+    --radius-card: 1.25rem;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 5rem;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    summary::-webkit-details-marker {
+        display: none;
+    }
+}
+
+@layer components {
+    .bg-grid {
+        background-image:
+            radial-gradient(60rem 28rem at 50% -10%, var(--glow), transparent 70%),
+            linear-gradient(var(--line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: auto, 56px 56px, 56px 56px;
+        mask-image: linear-gradient(to bottom, #000 40%, transparent);
+    }
+
+    .text-gradient {
+        background-image: linear-gradient(120deg, var(--fg) 20%, var(--accent) 60%, var(--accent-2));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .prose-ai p + p,
+    .prose-ai ul + p,
+    .prose-ai ol + p,
+    .prose-ai p + ul,
+    .prose-ai p + ol {
+        margin-top: 0.6rem;
+    }
+
+    .prose-ai ul {
+        list-style: disc;
+        padding-left: 1.25rem;
+    }
+
+    .prose-ai ol {
+        list-style: decimal;
+        padding-left: 1.25rem;
+    }
+
+    .prose-ai li {
+        margin-top: 0.25rem;
+    }
+
+    .prose-ai a {
+        color: var(--accent);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    .prose-ai strong {
+        color: var(--fg);
+        font-weight: 600;
+    }
+}
+
+@keyframes shimmer {
+    from {
+        background-position: -200% 0;
+    }
+    to {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--line-strong) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }
