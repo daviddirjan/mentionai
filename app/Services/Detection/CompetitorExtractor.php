@@ -47,6 +47,7 @@ class CompetitorExtractor
         $domainKey = TextNormalizer::key(explode('.', $domain)[0] ?? '');
         if ($domainKey !== '') {
             $brandKeys[] = $domainKey;
+            $brandKeys[] = TextNormalizer::key($domain);
         }
 
         $found = []; // key => [name, domain, count, providers, nameVotes]
