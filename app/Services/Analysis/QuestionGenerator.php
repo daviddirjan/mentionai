@@ -359,7 +359,8 @@ class QuestionGenerator
         $country = self::countryName($market, $language);
 
         $values = [
-            'industry' => self::safe($industry, $terms) ?? $generic,
+            // Without an industry, a scraped service reads better than the generic word ("companii de companii").
+            'industry' => self::safe($industry, $terms) ?? self::scrapedService($inspection, 0, $terms) ?? $generic,
             'market' => $country,
             'language' => Locale::getDisplayLanguage($language, $language) ?: $language,
         ];
@@ -367,6 +368,11 @@ class QuestionGenerator
         $values['city'] = self::place($location, $country, $terms) ?? self::safe($inspection['city'] ?? null, $terms) ?? $country;
 
         $question = self::fill($pattern, $values);
+        if ($values['industry'] === $generic) {
+            // e.g. RO "companii de companii", FR "entreprises de entreprises" → keep one word.
+            $question = preg_replace('/\b('.preg_quote($generic, '/').')\s+(?:de|d’|di|van|von|of)\s+\1\b/u', '$1', $question);
+            $question = preg_replace('/\bbusinesses (companies|businesses|providers)\b/u', '$1', $question);
+        }
 
         if (self::leaks($question, $terms)) {
             $question = self::strip($question, $terms);

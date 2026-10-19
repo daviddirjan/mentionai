@@ -76,7 +76,7 @@ class QuestionGeneratorTest extends TestCase
 
         $texts = app(QuestionGenerator::class)->generate($analysis)->pluck('question')->all();
 
-        $this->assertStringContainsString('businesses companies in Romania', $texts[0]);
+        $this->assertStringContainsString('the best companies in Romania', $texts[0]);
         $this->assertStringContainsString('businesses in Romania', $texts[1]); // {service} -> industry -> "businesses"
         $this->assertStringContainsString('in Romania', $texts[2]);            // {city} -> market
     }
