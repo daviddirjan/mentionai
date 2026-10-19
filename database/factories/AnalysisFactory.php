@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\AnalysisStatus;
+use App\Enums\AnalysisTier;
 use App\Enums\MentionClassification;
 use App\Enums\ProviderSlug;
 use App\Enums\ResponseStatus;
@@ -31,6 +32,43 @@ class AnalysisFactory extends Factory
             'is_demo' => false,
             'config_hash' => fn (array $a) => hash('sha256', $a['domain'].'|'.$a['market'].'|'.$a['language'].'|test'),
         ];
+    }
+
+    /**
+     * A completed GEO audit: completed() data plus a site audit (robots/sitemap missing, 2 H1, no lang),
+     * rule recommendations and a narrative. Questions/responses are the same 3x4 set as completed().
+     */
+    public function audit(): static
+    {
+        return $this->completed()->state(fn () => [
+            'tier' => AnalysisTier::Audit,
+            'location' => 'Oradea',
+            'site_audit' => [
+                ['key' => 'homepage_status', 'group' => 'access', 'status' => 'pass', 'evidence' => 'GET / → 200', 'params' => []],
+                ['key' => 'robots_txt', 'group' => 'access', 'status' => 'fail', 'evidence' => 'GET /robots.txt → 404', 'params' => []],
+                ['key' => 'sitemap_xml', 'group' => 'access', 'status' => 'fail', 'evidence' => 'GET /sitemap.xml → 404', 'params' => []],
+                ['key' => 'llms_txt', 'group' => 'access', 'status' => 'warn', 'evidence' => 'GET /llms.txt → 404', 'params' => []],
+                ['key' => 'ai_crawler_gptbot', 'group' => 'ai_crawlers', 'status' => 'pass', 'evidence' => 'No robots.txt rule blocks GPTBot', 'params' => ['bot' => 'GPTBot']],
+                ['key' => 'h1_count', 'group' => 'structure', 'status' => 'warn', 'evidence' => '2 × <h1>', 'params' => ['count' => 2]],
+                ['key' => 'html_lang', 'group' => 'structure', 'status' => 'fail', 'evidence' => '<html> without lang', 'params' => []],
+                ['key' => 'jsonld_local', 'group' => 'entity', 'status' => 'warn', 'evidence' => 'JSON-LD @type Organization, no addressLocality', 'params' => ['location' => 'Oradea']],
+            ],
+            'recommendations' => [
+                ['key' => 'publish_robots_sitemap', 'priority' => 'p0', 'window' => '0-7', 'source' => 'check:sitemap_xml', 'params' => []],
+                ['key' => 'fix_html_lang_h1', 'priority' => 'p0', 'window' => '0-14', 'source' => 'check:html_lang', 'params' => []],
+                ['key' => 'add_local_business_schema', 'priority' => 'p0', 'window' => '0-21', 'source' => 'check:jsonld_local', 'params' => ['location' => 'Oradea']],
+                ['key' => 'local_landing_page', 'priority' => 'p1', 'window' => '15-30', 'source' => 'visibility:local_not_recommended', 'params' => ['location' => 'Oradea']],
+                ['key' => 'publish_llms_txt', 'priority' => 'p2', 'window' => '60-90', 'source' => 'check:llms_txt', 'params' => []],
+            ],
+            'narrative' => [
+                'verdict' => 'Demo verdict: the site is reachable, but local and technical signals are too weak for strong local AI recommendations.',
+                'summary' => ['Demo: robots.txt and sitemap.xml return 404.', 'Demo: recommended in 3 of 11 successful tests.'],
+                'h1' => 'Custom software development in Oradea',
+                'title' => 'Software development Oradea | Web apps, CRM and AI',
+                'meta_description' => 'Custom web apps, CRM and AI integrations for companies in Oradea and Romania.',
+                'source' => 'demo',
+            ],
+        ]);
     }
 
     public function demo(): static

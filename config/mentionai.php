@@ -79,6 +79,12 @@ return [
         'ip_analyses_per_hour' => 5,
         'cache_hours' => 24,                // reuse identical analyses younger than this
 
+        'audit_enabled' => true,            // GEO audit (tier audit) after a lead leaves an email
+        'audit_query_count' => 25,          // discovery questions per audit (x enabled providers = tests)
+        'max_cost_per_audit' => 2.00,       // USD estimate
+        'audit_narrative_provider' => 'openai', // provider slug for the one verdict/summary call
+        'report_link_days' => 30,           // validity of the signed PDF link sent by email
+
         'data_retention_days' => 365,
 
         'report_price' => 9900,             // minor units; used once payments ship

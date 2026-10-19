@@ -203,7 +203,7 @@ class AnalysisStarterTest extends TestCase
         Analysis::query()->update(['status' => AnalysisStatus::Failed->value]);
         $market = $this->start(['market' => 'DE'])->analysis->config_hash;
         Analysis::query()->update(['status' => AnalysisStatus::Failed->value]);
-        PromptTemplate::query()->where('is_enabled', false)->first()->update(['is_enabled' => true]);
+        PromptTemplate::query()->where('name', 'Local choice')->first()->update(['is_enabled' => false]);
         $templates = $this->start()->analysis->config_hash;
         Analysis::query()->update(['status' => AnalysisStatus::Failed->value]);
         config(['mentionai.ai_mode' => 'live']);

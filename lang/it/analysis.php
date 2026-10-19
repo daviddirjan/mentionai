@@ -4,6 +4,7 @@ return [
     'status' => [
         'pending' => 'In coda',
         'inspecting_website' => 'Lettura del tuo sito web',
+        'auditing_site' => 'Controlli tecnici GEO',
         'generating_questions' => 'Preparazione delle domande di scoperta',
         'querying_providers' => 'Interrogazione degli assistenti IA',
         'analyzing' => 'Analisi delle risposte',
@@ -28,5 +29,6 @@ return [
         'budget_exceeded' => 'Le analisi gratuite non sono temporaneamente disponibili. Riprova più tardi.',
         'disabled' => 'Le analisi gratuite sono attualmente sospese. Riprova più tardi.',
         'invalid_url' => 'Non siamo riusciti a raggiungere quel sito web. Controlla l’indirizzo e riprova.',
+        'not_eligible' => 'Un audit GEO può essere avviato solo da una verifica gratuita completata.',
     ],
 ];

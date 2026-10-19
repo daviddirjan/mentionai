@@ -4,6 +4,7 @@ return [
     'status' => [
         'pending' => 'Queued',
         'inspecting_website' => 'Reading your website',
+        'auditing_site' => 'Running technical GEO checks',
         'generating_questions' => 'Preparing discovery questions',
         'querying_providers' => 'Asking the AI assistants',
         'analyzing' => 'Analyzing the answers',
@@ -28,5 +29,6 @@ return [
         'budget_exceeded' => 'Free analyses are temporarily unavailable. Please try again later.',
         'disabled' => 'Free analyses are currently paused. Please try again later.',
         'invalid_url' => 'We could not reach that website. Check the address and try again.',
+        'not_eligible' => 'A GEO audit can only be started from a completed free check.',
     ],
 ];

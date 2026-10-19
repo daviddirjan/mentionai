@@ -4,6 +4,7 @@ return [
     'status' => [
         'pending' => 'In de wachtrij',
         'inspecting_website' => 'Je website wordt gelezen',
+        'auditing_site' => 'Technische GEO-controles',
         'generating_questions' => 'Ontdekkingsvragen worden voorbereid',
         'querying_providers' => 'De AI-assistenten worden bevraagd',
         'analyzing' => 'De antwoorden worden geanalyseerd',
@@ -28,5 +29,6 @@ return [
         'budget_exceeded' => 'Gratis analyses zijn tijdelijk niet beschikbaar. Probeer het later opnieuw.',
         'disabled' => 'Gratis analyses zijn momenteel gepauzeerd. Probeer het later opnieuw.',
         'invalid_url' => 'We konden die website niet bereiken. Controleer het adres en probeer het opnieuw.',
+        'not_eligible' => 'Een GEO-audit kan alleen worden gestart vanuit een voltooide gratis check.',
     ],
 ];

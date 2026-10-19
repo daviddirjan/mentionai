@@ -4,6 +4,7 @@ return [
     'status' => [
         'pending' => 'In der Warteschlange',
         'inspecting_website' => 'Ihre Website wird gelesen',
+        'auditing_site' => 'Technische GEO-Prüfungen laufen',
         'generating_questions' => 'Entdeckungsfragen werden vorbereitet',
         'querying_providers' => 'KI-Assistenten werden befragt',
         'analyzing' => 'Antworten werden analysiert',
@@ -28,5 +29,6 @@ return [
         'budget_exceeded' => 'Kostenlose Analysen sind vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.',
         'disabled' => 'Kostenlose Analysen sind derzeit pausiert. Bitte versuchen Sie es später erneut.',
         'invalid_url' => 'Wir konnten diese Website nicht erreichen. Prüfen Sie die Adresse und versuchen Sie es erneut.',
+        'not_eligible' => 'Ein GEO-Audit kann nur aus einer abgeschlossenen kostenlosen Prüfung gestartet werden.',
     ],
 ];

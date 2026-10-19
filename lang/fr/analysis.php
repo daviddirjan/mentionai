@@ -4,6 +4,7 @@ return [
     'status' => [
         'pending' => 'En file d’attente',
         'inspecting_website' => 'Lecture de votre site web',
+        'auditing_site' => 'Vérifications techniques GEO',
         'generating_questions' => 'Préparation des questions de découverte',
         'querying_providers' => 'Interrogation des assistants IA',
         'analyzing' => 'Analyse des réponses',
@@ -28,5 +29,6 @@ return [
         'budget_exceeded' => 'Les analyses gratuites sont temporairement indisponibles. Veuillez réessayer plus tard.',
         'disabled' => 'Les analyses gratuites sont actuellement suspendues. Veuillez réessayer plus tard.',
         'invalid_url' => 'Nous n’avons pas pu accéder à ce site web. Vérifiez l’adresse et réessayez.',
+        'not_eligible' => 'Un audit GEO ne peut être lancé qu’à partir d’une vérification gratuite terminée.',
     ],
 ];

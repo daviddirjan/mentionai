@@ -4,6 +4,7 @@ return [
     'status' => [
         'pending' => 'En cola',
         'inspecting_website' => 'Leyendo tu sitio web',
+        'auditing_site' => 'Comprobaciones técnicas GEO',
         'generating_questions' => 'Preparando las preguntas de descubrimiento',
         'querying_providers' => 'Consultando a los asistentes de IA',
         'analyzing' => 'Analizando las respuestas',
@@ -28,5 +29,6 @@ return [
         'budget_exceeded' => 'Los análisis gratuitos no están disponibles temporalmente. Inténtalo de nuevo más tarde.',
         'disabled' => 'Los análisis gratuitos están en pausa. Inténtalo de nuevo más tarde.',
         'invalid_url' => 'No hemos podido acceder a ese sitio web. Revisa la dirección e inténtalo de nuevo.',
+        'not_eligible' => 'Una auditoría GEO solo puede iniciarse desde una comprobación gratuita completada.',
     ],
 ];

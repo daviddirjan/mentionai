@@ -4,6 +4,7 @@ return [
     'status' => [
         'pending' => 'În coadă',
         'inspecting_website' => 'Citim site-ul tău',
+        'auditing_site' => 'Verificări tehnice GEO',
         'generating_questions' => 'Pregătim întrebările de descoperire',
         'querying_providers' => 'Întrebăm asistenții AI',
         'analyzing' => 'Analizăm răspunsurile',
@@ -28,5 +29,6 @@ return [
         'budget_exceeded' => 'Analizele gratuite sunt temporar indisponibile. Încearcă din nou mai târziu.',
         'disabled' => 'Analizele gratuite sunt momentan suspendate. Încearcă din nou mai târziu.',
         'invalid_url' => 'Nu am putut accesa acest site. Verifică adresa și încearcă din nou.',
+        'not_eligible' => 'Un audit GEO poate fi pornit doar dintr-o verificare gratuită finalizată.',
     ],
 ];

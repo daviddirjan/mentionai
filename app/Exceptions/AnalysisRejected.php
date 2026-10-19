@@ -17,6 +17,7 @@ class AnalysisRejected extends RuntimeException
     public const BUDGET_EXCEEDED = 'budget_exceeded'; // monthly / per-analysis budget
     public const DISABLED = 'disabled';               // global switch off or no providers enabled
     public const INVALID_URL = 'invalid_url';         // unsafe or unresolvable website
+    public const NOT_ELIGIBLE = 'not_eligible';       // audit requested from an analysis that is not a completed free check
 
     public function __construct(
         public readonly string $reason,

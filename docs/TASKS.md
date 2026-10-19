@@ -63,3 +63,26 @@ Status: `[ ]` todo · `[~]` in progress · `[x]` done & integrated · `[!]` bloc
 - [ ] PDF GEO audit report
 - [ ] Admin orders/reports resources
 - [ ] README deployment docs
+
+## Phase 3 — Final version: GEO Audit, PDF, redesign (spec: docs/AUDIT.md)
+- [x] L1 Schema (tier, site_audit, recommendations, narrative, report), enums, DTOs, contracts, settings, 25 templates, fonts
+### Backend & AI (`backend-audit` worktree)
+- [ ] BA1 SafeFetcher extracted from WebsiteInspector
+- [ ] BA2 DefaultSiteAuditor (check keys in AUDIT.md)
+- [ ] BA3 QuestionGenerator audit tier (25 questions, 9 languages for all templates, free check excludes audit-only)
+- [ ] BA4 RuleRecommendationBuilder
+- [ ] BA5 AiAuditNarrator (grounded, mock demo, rules fallback)
+- [ ] BA6 History comparison + DefaultAuditReportBuilder
+- [ ] BA7 DompdfReportRenderer + GenerateAuditReport job + mail dispatch
+- [ ] BA8 DefaultAuditStarter + pipeline tier handling (caps, budget)
+- [ ] BA9 Tests
+### Frontend (`frontend-final` worktree)
+- [ ] FF1 Axiontic design tokens, Afacad, components restyle
+- [ ] FF2 Simplified form
+- [ ] FF3 Landing: "Why MentionAI" comparison, lean sections
+- [ ] FF4 Results: audit CTA + email → AuditStarter, audit section, PDF button
+- [ ] FF5 PDF template pdf.geo-audit
+- [ ] FF6 report.download route, AuditReadyMail
+- [ ] FF7 lang audit.php ×9 + tests
+### Admin (`admin-audit` worktree)
+- [ ] AA1 Tier column/filter, PDF download/regenerate actions, infolist tables, settings fields, demo audit seed, tests

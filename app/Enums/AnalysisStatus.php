@@ -6,6 +6,7 @@ enum AnalysisStatus: string
 {
     case Pending = 'pending';
     case InspectingWebsite = 'inspecting_website';
+    case AuditingSite = 'auditing_site';           // audit tier only: technical GEO checks
     case GeneratingQuestions = 'generating_questions';
     case QueryingProviders = 'querying_providers';
     case Analyzing = 'analyzing';
@@ -25,10 +26,11 @@ enum AnalysisStatus: string
     }
 
     /** Ordered steps shown in the public progress indicator. */
-    public static function progressSteps(): array
+    public static function progressSteps(?AnalysisTier $tier = null): array
     {
         return [
             self::Pending,
+            ...($tier === AnalysisTier::Audit ? [self::AuditingSite] : []),
             self::GeneratingQuestions,
             self::QueryingProviders,
             self::Analyzing,

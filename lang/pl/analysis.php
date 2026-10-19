@@ -4,6 +4,7 @@ return [
     'status' => [
         'pending' => 'W kolejce',
         'inspecting_website' => 'Czytanie Twojej strony',
+        'auditing_site' => 'Techniczne kontrole GEO',
         'generating_questions' => 'Przygotowywanie pytań odkrywczych',
         'querying_providers' => 'Pytanie asystentów AI',
         'analyzing' => 'Analiza odpowiedzi',
@@ -28,5 +29,6 @@ return [
         'budget_exceeded' => 'Bezpłatne analizy są tymczasowo niedostępne. Spróbuj ponownie później.',
         'disabled' => 'Bezpłatne analizy są obecnie wstrzymane. Spróbuj ponownie później.',
         'invalid_url' => 'Nie udało się połączyć z tą stroną. Sprawdź adres i spróbuj ponownie.',
+        'not_eligible' => 'Audyt GEO można rozpocząć tylko z ukończonej bezpłatnej analizy.',
     ],
 ];
