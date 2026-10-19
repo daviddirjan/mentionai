@@ -25,10 +25,11 @@ class AnalysisFormTest extends FrontendTestCase
         $this->get('/en')
             ->assertOk()
             ->assertSee('Is AI recommending your business?')
-            ->assertSee('Check Your AI Visibility — Free')
+            ->assertSee('Check your AI visibility')
             ->assertSee('Analyze My Business')
             ->assertSee('href="#analyze"', false)
-            ->assertSee('99 RON');
+            ->assertSee('More options')
+            ->assertDontSee('99 RON');
     }
 
     public function test_required_fields_are_validated(): void
@@ -90,7 +91,7 @@ class AnalysisFormTest extends FrontendTestCase
         $this->filled()->set('location', '')->call('submit')->assertHasNoErrors();
         $this->assertNull($this->starter->received->location);
 
-        $this->get('/ro')->assertSee('Oraș / județ / regiune');
+        $this->get('/ro')->assertSee('Orașul');
     }
 
     public function test_turnstile_token_is_required_and_forwarded_when_configured(): void
@@ -137,6 +138,30 @@ class AnalysisFormTest extends FrontendTestCase
             ->call('submit')
             ->assertSee(__('analysis.rejected.domain_limit'))
             ->assertSee(route('analysis.show', ['locale' => 'en', 'analysis' => $existing->uuid]), false);
+    }
+
+    public function test_form_fields_are_ordered_website_company_country_city(): void
+    {
+        $html = $this->get('/en')->assertOk()->getContent();
+
+        $positions = array_map(fn ($id) => strpos($html, 'id="'.$id.'"'), ['websiteUrl', 'companyName', 'market', 'location', 'industry', 'language']);
+        $this->assertNotContains(false, $positions);
+        $sorted = $positions;
+        sort($sorted);
+        $this->assertSame($sorted, $positions);
+    }
+
+    public function test_language_follows_the_country_until_changed_manually(): void
+    {
+        $component = Livewire::test(AnalysisForm::class)->assertSet('language', 'en');
+
+        $component->set('market', 'RO')->assertSet('language', 'ro');
+        $component->set('market', 'AT')->assertSet('language', 'de');
+        $component->set('market', 'BR')->assertSet('language', 'pt');
+        $component->set('market', 'BE')->assertSet('language', 'fr');
+        $component->set('market', 'US')->assertSet('language', 'en');
+
+        $component->set('language', 'it')->set('market', 'PL')->assertSet('language', 'it');
     }
 
     public function test_honeypot_blocks_bots_silently(): void

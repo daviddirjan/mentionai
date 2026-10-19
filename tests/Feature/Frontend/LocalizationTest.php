@@ -60,7 +60,7 @@ class LocalizationTest extends FrontendTestCase
 
     public function test_all_locales_have_the_same_translation_keys_as_english(): void
     {
-        foreach (['site', 'analysis'] as $file) {
+        foreach (['site', 'analysis', 'audit'] as $file) {
             $expected = $this->keys(require lang_path("en/{$file}.php"));
             foreach (config('mentionai.locales') as $locale) {
                 $actual = $this->keys(require lang_path("{$locale}/{$file}.php"));

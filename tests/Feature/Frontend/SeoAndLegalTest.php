@@ -45,9 +45,11 @@ class SeoAndLegalTest extends FrontendTestCase
     {
         $response = $this->get('/en')->assertOk();
 
-        foreach (['id="how"', 'id="platforms"', 'id="why"', 'id="example"', 'id="features"', 'id="pricing"', 'id="faq"', 'id="contact"'] as $anchor) {
+        foreach (['id="analyze"', 'id="platforms"', 'id="compare"', 'id="how"', 'id="example"', 'id="pricing"', 'id="faq"', 'id="contact"'] as $anchor) {
             $response->assertSee($anchor, false);
         }
+        $response->assertSeeInOrder(['id="analyze"', 'id="platforms"', 'id="compare"', 'id="how"', 'id="example"', 'id="pricing"', 'id="faq"', 'id="contact"'], false);
+        $response->assertDontSee('id="why"', false)->assertDontSee('id="features"', false);
         $response->assertSee('Illustrative example with sample data');
         $response->assertDontSee('testimonial', false);
     }
