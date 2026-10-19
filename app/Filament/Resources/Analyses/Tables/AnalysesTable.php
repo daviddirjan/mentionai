@@ -30,6 +30,7 @@ class AnalysesTable
                 TextColumn::make('company_name')->label('Company')->searchable()->sortable(),
                 TextColumn::make('domain')->label('Website')->searchable(),
                 TextColumn::make('market')->sortable(),
+                TextColumn::make('location')->label('City / region')->placeholder('—')->toggleable(),
                 TextColumn::make('language')->sortable(),
                 TextColumn::make('visibility_score')->label('Score')->numeric(1)->suffix('%')->sortable()->placeholder('n/a'),
                 TextColumn::make('status')->badge()
@@ -82,9 +83,9 @@ class AnalysesTable
                     ->icon('heroicon-o-arrow-down-tray')
                     ->action(fn ($livewire) => Csv::download(
                         'analyses-'.now()->format('Ymd-His').'.csv',
-                        ['id', 'uuid', 'company', 'website', 'market', 'language', 'industry', 'status', 'score', 'successful_tests', 'failed_tests', 'estimated_cost_usd', 'demo', 'created_at'],
+                        ['id', 'uuid', 'company', 'website', 'market', 'location', 'language', 'industry', 'status', 'score', 'successful_tests', 'failed_tests', 'estimated_cost_usd', 'demo', 'created_at'],
                         $livewire->getFilteredSortedTableQuery(),
-                        fn (Analysis $a) => [$a->id, $a->uuid, $a->company_name, $a->domain, $a->market, $a->language, $a->industry, $a->status->value, $a->visibility_score, $a->successful_tests, $a->failed_tests, $a->estimated_cost, $a->is_demo ? 'yes' : 'no', $a->created_at],
+                        fn (Analysis $a) => [$a->id, $a->uuid, $a->company_name, $a->domain, $a->market, $a->location, $a->language, $a->industry, $a->status->value, $a->visibility_score, $a->successful_tests, $a->failed_tests, $a->estimated_cost, $a->is_demo ? 'yes' : 'no', $a->created_at],
                     )),
                 BulkActionGroup::make([DeleteBulkAction::make()]),
             ]);

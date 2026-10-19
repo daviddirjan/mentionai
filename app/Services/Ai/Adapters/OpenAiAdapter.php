@@ -28,6 +28,11 @@ class OpenAiAdapter extends HttpProviderAdapter
             'max_output_tokens' => $maxTokens,
         ];
 
+        // Reasoning tokens count against max_output_tokens; at the default effort they can use it all and leave no answer.
+        if (preg_match('/^(gpt-5|o\d)/i', (string) $provider->model)) {
+            $body['reasoning'] = ['effort' => 'low'];
+        }
+
         if ($withSearch) {
             $tool = ['type' => 'web_search'];
             if (preg_match('/^[A-Za-z]{2}$/', $query->market)) {

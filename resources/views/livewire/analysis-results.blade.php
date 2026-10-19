@@ -35,6 +35,9 @@
         <dl class="mt-5 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
             <div><dt class="text-subtle">{{ __('site.results.website') }}</dt><dd class="mt-0.5 break-all font-medium">{{ $analysis->domain }}</dd></div>
             <div><dt class="text-subtle">{{ __('site.results.market') }}</dt><dd class="mt-0.5 font-medium">{{ $marketName }}</dd></div>
+            @if ($analysis->location)
+                <div><dt class="text-subtle">{{ __('site.results.location') }}</dt><dd class="mt-0.5 font-medium">{{ $analysis->location }}</dd></div>
+            @endif
             @if ($analysis->industry)
                 <div><dt class="text-subtle">{{ __('site.results.industry') }}</dt><dd class="mt-0.5 font-medium">{{ $analysis->industry }}</dd></div>
             @endif

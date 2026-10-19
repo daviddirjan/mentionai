@@ -25,8 +25,9 @@
                 <x-ui.input name="companyName" wire:model="companyName" :label="__('site.form.company')" :placeholder="__('site.form.company_placeholder')" required maxlength="120" autocomplete="organization" />
                 <x-ui.input name="websiteUrl" wire:model="websiteUrl" :label="__('site.form.website')" :placeholder="__('site.form.website_placeholder')" required type="text" inputmode="url" autocomplete="url" />
                 <x-ui.select name="market" wire:model="market" :label="__('site.form.market')" :options="$countries" :placeholder="__('site.form.market_placeholder')" required />
+                <x-ui.input name="location" wire:model="location" :label="__('site.form.location').' ('.__('site.common.optional').')'" :placeholder="__('site.form.location_placeholder')" :hint="__('site.form.location_hint')" maxlength="120" autocomplete="address-level2" />
                 <x-ui.input name="industry" wire:model="industry" :label="__('site.form.industry').' ('.__('site.common.optional').')'" :placeholder="__('site.form.industry_placeholder')" maxlength="120" />
-                <div class="sm:col-span-2">
+                <div>
                     <x-ui.select name="language" wire:model="language" :label="__('site.form.language')" :options="$languages" required />
                     <p class="mt-1 text-xs text-subtle">{{ __('site.form.language_hint') }}</p>
                 </div>

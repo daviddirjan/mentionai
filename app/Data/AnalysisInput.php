@@ -17,5 +17,6 @@ final readonly class AnalysisInput
         public string $interfaceLocale, // the UI locale the visitor is browsing in
         public string $ip,
         public ?string $turnstileToken = null,
+        public ?string $location = null, // optional city / county / region within the market
     ) {}
 }

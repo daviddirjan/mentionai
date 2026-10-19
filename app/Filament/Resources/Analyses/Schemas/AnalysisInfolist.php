@@ -21,6 +21,7 @@ class AnalysisInfolist
                 TextEntry::make('company_name')->label('Company'),
                 TextEntry::make('website_url')->label('Website')->url(fn (Analysis $record) => $record->website_url, true),
                 TextEntry::make('market'),
+                TextEntry::make('location')->label('City / region')->placeholder('n/a'),
                 TextEntry::make('language'),
                 TextEntry::make('industry')->placeholder('n/a'),
                 TextEntry::make('interface_locale')->label('Interface locale'),

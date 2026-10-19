@@ -91,6 +91,27 @@ class QuestionGeneratorTest extends TestCase
         $this->assertStringContainsString('Timisoara', $texts);
     }
 
+    public function test_visitor_location_fills_the_local_question_ahead_of_the_scraped_city(): void
+    {
+        $analysis = $this->analysis(['location' => 'Cluj-Napoca', 'website_inspection' => ['city' => 'Timisoara']]);
+
+        $texts = app(QuestionGenerator::class)->generate($analysis)->pluck('question');
+
+        $this->assertSame('I need a trustworthy Software Development provider in Cluj-Napoca, Romania. Which companies would you suggest?', $texts[2]);
+        $this->assertStringContainsString('in Romania', $texts[0]);
+        $this->assertStringNotContainsString('Timisoara', $texts->implode(' '));
+    }
+
+    public function test_location_is_localized_and_not_doubled_with_the_country(): void
+    {
+        $terms = QuestionGenerator::brandTerms('Zorbix', 'zorbix.example');
+        $local = 'I need a trustworthy {industry} provider in {city}. Which companies would you suggest?';
+
+        $this->assertStringContainsString('în Iași, România.', QuestionGenerator::build($local, 'ro', 'RO', 'IT', [], 0, $terms, 'Iași'));
+        $this->assertStringContainsString('in Cluj, Romania.', QuestionGenerator::build($local, 'en', 'RO', 'IT', [], 0, $terms, 'Cluj, Romania'));
+        $this->assertStringContainsString('in Romania.', QuestionGenerator::build($local, 'en', 'RO', 'IT', [], 0, $terms, 'Zorbix'));
+    }
+
     public function test_questions_are_written_in_the_analysis_language(): void
     {
         $expect = ['ro' => 'România', 'de' => 'Deutschland', 'es' => 'España', 'fr' => 'France', 'it' => 'Italia', 'pt' => 'Portugal', 'nl' => 'Nederland', 'pl' => 'Polska'];

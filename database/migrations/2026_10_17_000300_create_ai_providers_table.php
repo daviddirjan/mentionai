@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('model');
             $table->unsignedSmallInteger('max_requests_per_analysis')->default(3);
             $table->unsignedSmallInteger('timeout_seconds')->default(60);
-            $table->unsignedInteger('max_output_tokens')->default(1024);
+            $table->unsignedInteger('max_output_tokens')->default(4096);
             $table->unsignedSmallInteger('max_search_calls')->nullable();
             // Estimated prices in USD. Token prices are per 1M tokens, search price per 1K searches.
             $table->decimal('input_price_per_million', 12, 6)->default(0);

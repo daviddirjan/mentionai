@@ -18,7 +18,7 @@ return [
         'gemini' => [
             'api_key' => env('GEMINI_API_KEY'),
             'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
-            'default_model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
+            'default_model' => env('GEMINI_MODEL', 'gemini-3.8-flash'),
         ],
         'anthropic' => [
             'api_key' => env('ANTHROPIC_API_KEY'),
@@ -28,7 +28,7 @@ return [
         'perplexity' => [
             'api_key' => env('PERPLEXITY_API_KEY'),
             'base_url' => env('PERPLEXITY_BASE_URL', 'https://api.perplexity.ai'),
-            'default_model' => env('PERPLEXITY_MODEL', 'sonar'),
+            'default_model' => env('PERPLEXITY_MODEL', 'fast'),
         ],
     ],
 

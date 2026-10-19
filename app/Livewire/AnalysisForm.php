@@ -21,6 +21,8 @@ class AnalysisForm extends Component
 
     public string $market = '';
 
+    public string $location = '';
+
     public string $industry = '';
 
     public string $language = '';
@@ -50,6 +52,7 @@ class AnalysisForm extends Component
                 }
             }],
             'market' => ['required', 'in:'.implode(',', Countries::codes())],
+            'location' => ['nullable', 'string', 'max:120'],
             'industry' => ['nullable', 'string', 'max:120'],
             'language' => ['required', 'in:'.implode(',', config('mentionai.analysis_languages'))],
         ];
@@ -67,6 +70,7 @@ class AnalysisForm extends Component
             'companyName' => __('site.form.company'),
             'websiteUrl' => __('site.form.website'),
             'market' => __('site.form.market'),
+            'location' => __('site.form.location'),
             'industry' => __('site.form.industry'),
             'language' => __('site.form.language'),
             'turnstileToken' => __('site.form.verification'),
@@ -93,6 +97,7 @@ class AnalysisForm extends Component
             interfaceLocale: $this->locale,
             ip: (string) request()->ip(),
             turnstileToken: $this->turnstileToken !== '' ? $this->turnstileToken : null,
+            location: trim($this->location) !== '' ? trim($this->location) : null,
         );
 
         try {

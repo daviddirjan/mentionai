@@ -83,11 +83,13 @@ class AdapterTest extends TestCase
                 ],
                 'usage' => ['input_tokens' => 100, 'output_tokens' => 50, 'server_tool_use' => ['web_search_requests' => 1]],
             ], 1],
-            'perplexity' => [ProviderSlug::Perplexity, 'api.perplexity.ai/chat/completions', [
-                'choices' => [['message' => ['content' => '1. **Alpha Co**']]],
-                'citations' => ['https://alpha.example'],
-                'search_results' => [['title' => 'Alpha', 'url' => 'https://alpha.example']],
-                'usage' => ['prompt_tokens' => 100, 'completion_tokens' => 50],
+            'perplexity' => [ProviderSlug::Perplexity, 'api.perplexity.ai/v1/agent', [
+                'status' => 'completed',
+                'output' => [
+                    ['type' => 'search_results', 'results' => [['id' => 1, 'title' => 'Alpha', 'url' => 'https://alpha.example'], ['id' => 2, 'title' => 'dup', 'url' => 'https://alpha.example']]],
+                    ['type' => 'message', 'content' => [['type' => 'output_text', 'text' => '1. **Alpha Co** [1]', 'annotations' => []]]],
+                ],
+                'usage' => ['input_tokens' => 100, 'output_tokens' => 50, 'tool_calls_details' => ['search_web' => ['invocation' => 1, 'cost_usd' => 0.001]]],
             ], 1],
         ];
     }
@@ -117,7 +119,8 @@ class AdapterTest extends TestCase
         Http::fake(fn () => Http::response(['output' => [['type' => 'message', 'content' => [['type' => 'output_text', 'text' => 'ok']]]]]));
         $this->adapter(ProviderSlug::OpenAI)->query($this->provider(ProviderSlug::OpenAI), $this->pq());
         Http::assertSent(fn (Request $r) => $r->hasHeader('Authorization', 'Bearer '.self::SECRET)
-            && $r['model'] === 'm-1' && $r['tools'][0]['type'] === 'web_search' && $r['max_output_tokens'] === 500 && $r['max_tool_calls'] === 2);
+            && $r['model'] === 'm-1' && $r['tools'][0]['type'] === 'web_search' && $r['max_output_tokens'] === 500 && $r['max_tool_calls'] === 2
+            && ! isset($r['reasoning']));
 
         Http::fake(fn () => Http::response(['content' => [['type' => 'text', 'text' => 'ok']]]));
         $this->adapter(ProviderSlug::Anthropic)->query($this->provider(ProviderSlug::Anthropic), $this->pq());
@@ -128,6 +131,44 @@ class AdapterTest extends TestCase
         $this->adapter(ProviderSlug::Gemini)->query($this->provider(ProviderSlug::Gemini), $this->pq());
         Http::assertSent(fn (Request $r) => str_contains($r->url(), ':generateContent') && ! str_contains($r->url(), self::SECRET)
             && $r->hasHeader('x-goog-api-key', self::SECRET) && isset($r['tools'][0]['google_search']));
+
+        Http::fake(fn () => Http::response(['output' => [['type' => 'message', 'content' => [['type' => 'output_text', 'text' => 'ok']]]]]));
+        $this->adapter(ProviderSlug::Perplexity)->query($this->provider(ProviderSlug::Perplexity), $this->pq());
+        Http::assertSent(fn (Request $r) => str_ends_with($r->url(), '/v1/agent') && $r->hasHeader('Authorization', 'Bearer '.self::SECRET)
+            && $r['preset'] === 'm-1' && ! isset($r['model']) && $r['input'] === $this->pq()->question
+            && $r['tools'][0] === ['type' => 'web_search', 'user_location' => ['country' => 'RO']]);
+    }
+
+    public function test_openai_reasoning_models_use_low_effort(): void
+    {
+        Http::fake(fn () => Http::response(['output' => [['type' => 'message', 'content' => [['type' => 'output_text', 'text' => 'ok']]]]]));
+        $provider = $this->provider(ProviderSlug::OpenAI);
+        $provider->update(['model' => 'gpt-5-mini']);
+
+        $this->adapter(ProviderSlug::OpenAI)->query($provider, $this->pq());
+
+        Http::assertSent(fn (Request $r) => $r['reasoning'] === ['effort' => 'low']);
+    }
+
+    public function test_perplexity_sends_a_direct_model_id_as_model(): void
+    {
+        Http::fake(fn () => Http::response(['output' => [['type' => 'message', 'content' => [['type' => 'output_text', 'text' => 'ok']]]]]));
+        $provider = $this->provider(ProviderSlug::Perplexity);
+        $provider->update(['model' => 'perplexity/sonar']);
+
+        $this->adapter(ProviderSlug::Perplexity)->query($provider, $this->pq());
+
+        Http::assertSent(fn (Request $r) => $r['model'] === 'perplexity/sonar' && ! isset($r['preset']));
+    }
+
+    public function test_token_exhaustion_is_reported_as_such(): void
+    {
+        Http::fake(fn () => Http::response(['status' => 'incomplete', 'incomplete_details' => ['reason' => 'max_output_tokens'], 'output' => [['type' => 'reasoning']]]));
+
+        $result = $this->adapter(ProviderSlug::OpenAI)->query($this->provider(ProviderSlug::OpenAI), $this->pq());
+
+        $this->assertSame('invalid_response', $result->errorCode);
+        $this->assertStringContainsString('max_output_tokens', $result->errorMessage);
     }
 
     #[DataProvider('successPayloads')]
@@ -177,7 +218,7 @@ class AdapterTest extends TestCase
 
     public function test_test_connection_updates_provider_and_logs_usage(): void
     {
-        Http::fake(['*' => Http::response(['choices' => [['message' => ['content' => 'OK']]], 'usage' => ['prompt_tokens' => 5, 'completion_tokens' => 1]])]);
+        Http::fake(['*' => Http::response(['output' => [['type' => 'message', 'content' => [['type' => 'output_text', 'text' => 'OK']]]], 'usage' => ['input_tokens' => 5, 'output_tokens' => 1]])]);
         $provider = $this->provider(ProviderSlug::Perplexity);
 
         $result = $this->adapter(ProviderSlug::Perplexity)->testConnection($provider);

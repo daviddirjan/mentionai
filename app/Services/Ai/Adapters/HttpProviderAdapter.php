@@ -41,7 +41,7 @@ abstract class HttpProviderAdapter implements AiProviderAdapter
 
     public function testConnection(AiProvider $provider): ConnectionTestResult
     {
-        $result = $this->execute($provider, new ProviderQuery('Reply with the single word OK.', 'en', 'US'), false, 64);
+        $result = $this->execute($provider, new ProviderQuery('Reply with the single word OK.', 'en', 'US'), false, 512);
 
         $ok = $result->successful;
         $message = $ok ? 'Connection successful.' : ($result->errorMessage ?? 'Connection failed.');
@@ -114,7 +114,12 @@ abstract class HttpProviderAdapter implements AiProviderAdapter
         $normalized = is_array($json) ? $this->safeNormalize($json) : null;
 
         if ($normalized === null || trim($normalized['text']) === '') {
-            return ProviderResult::failure($slug, $model, 'invalid_response', 'The provider returned an unexpected or empty response.', $duration, is_array($json) ? $json : null);
+            $reason = is_array($json) ? ($json['incomplete_details']['reason'] ?? null) : null;
+            $message = is_string($reason)
+                ? "The provider stopped before answering ({$reason}). Raise max output tokens for this provider."
+                : 'The provider returned an unexpected or empty response.';
+
+            return ProviderResult::failure($slug, $model, 'invalid_response', $message, $duration, is_array($json) ? $json : null);
         }
 
         return new ProviderResult(

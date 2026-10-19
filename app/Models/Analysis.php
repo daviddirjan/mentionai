@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Public routes resolve analyses by `uuid` only (see getRouteKeyName). Never expose the numeric id.
  */
 #[Fillable([
-    'company_id', 'company_name', 'website_url', 'domain', 'market', 'language', 'industry', 'interface_locale',
+    'company_id', 'company_name', 'website_url', 'domain', 'market', 'location', 'language', 'industry', 'interface_locale',
     'status', 'is_demo', 'config_hash', 'website_inspection', 'query_config', 'visibility_score',
     'successful_tests', 'failed_tests', 'recommendation_count', 'mention_count', 'citation_count',
     'provider_scores', 'estimated_cost', 'ip_hash', 'error_message', 'started_at', 'completed_at',

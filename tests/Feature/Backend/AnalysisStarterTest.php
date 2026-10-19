@@ -44,6 +44,7 @@ class AnalysisStarterTest extends TestCase
             'en',
             $o['ip'] ?? '203.0.113.5',
             $o['token'] ?? null,
+            $o['location'] ?? null,
         );
     }
 
@@ -144,6 +145,23 @@ class AnalysisStarterTest extends TestCase
         $this->assertSame($first->id, $again->analysis->id);
         $this->assertSame(1, Analysis::count());
         Queue::assertPushed(RunAnalysis::class, 1);
+    }
+
+    public function test_location_is_stored_trimmed_and_separates_the_cache(): void
+    {
+        settings()->set('free_analyses_per_domain', 10);
+        $national = $this->start()->analysis;
+        $national->update(['status' => AnalysisStatus::Completed, 'completed_at' => now()]);
+
+        $local = $this->start(['location' => '  Cluj   Napoca ']);
+        $this->assertFalse($local->reused);
+        $this->assertSame('Cluj Napoca', $local->analysis->location);
+        $this->assertNull($national->location);
+        $local->analysis->update(['status' => AnalysisStatus::Completed, 'completed_at' => now()]);
+
+        $this->assertSame($local->analysis->id, $this->start(['location' => 'cluj napoca'])->analysis->id);
+        $this->assertNotSame($local->analysis->id, $this->start(['location' => 'Iași'])->analysis->id);
+        $this->assertSame($national->id, $this->start()->analysis->id);
     }
 
     public function test_expired_cache_and_window_allow_a_fresh_analysis(): void

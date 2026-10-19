@@ -92,7 +92,7 @@ class QuestionGenerator
             if ($questions->count() >= $count) {
                 break;
             }
-            $text = self::build($template->template, $analysis->language, $analysis->market, $analysis->industry, $inspection, $questions->count(), $terms);
+            $text = self::build($template->template, $analysis->language, $analysis->market, $analysis->industry, $inspection, $questions->count(), $terms, $analysis->location);
             if (isset($seen[mb_strtolower($text)])) {
                 continue;
             }
@@ -121,8 +121,9 @@ class QuestionGenerator
     /**
      * @param  array<string, mixed>  $inspection
      * @param  list<string>  $terms
+     * @param  ?string  $location  visitor-chosen city / county / region; fills {city} ahead of the scraped city
      */
-    public static function build(string $template, string $language, string $market, ?string $industry, array $inspection, int $offset, array $terms): string
+    public static function build(string $template, string $language, string $market, ?string $industry, array $inspection, int $offset, array $terms, ?string $location = null): string
     {
         $language = strtolower($language);
         $pattern = $language === 'en' || ! isset(self::PHRASES['top'][$language])
@@ -138,7 +139,7 @@ class QuestionGenerator
             'language' => Locale::getDisplayLanguage($language, $language) ?: $language,
         ];
         $values['service'] = self::safe($industry, $terms) ?? self::scrapedService($inspection, $offset, $terms) ?? $values['industry'];
-        $values['city'] = self::safe($inspection['city'] ?? null, $terms) ?? $country;
+        $values['city'] = self::place($location, $country, $terms) ?? self::safe($inspection['city'] ?? null, $terms) ?? $country;
 
         $question = self::fill($pattern, $values);
 
@@ -239,6 +240,21 @@ class QuestionGenerator
         }
 
         return trim(implode(' ', $words));
+    }
+
+    /**
+     * "Cluj" alone is ambiguous to a search engine, so the country is appended unless the visitor already wrote it.
+     *
+     * @param  list<string>  $terms
+     */
+    private static function place(?string $location, string $country, array $terms): ?string
+    {
+        $location = self::safe($location, $terms);
+        if ($location === null) {
+            return null;
+        }
+
+        return str_contains(TextNormalizer::fold($location), TextNormalizer::fold($country)) ? $location : "{$location}, {$country}";
     }
 
     private static function safe(?string $value, array $terms): ?string

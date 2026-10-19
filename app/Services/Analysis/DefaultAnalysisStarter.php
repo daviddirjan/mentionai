@@ -39,6 +39,8 @@ class DefaultAnalysisStarter implements AnalysisStarter
         $name = trim(preg_replace('/\s+/u', ' ', $input->companyName));
         $market = strtoupper(trim($input->market));
         $language = strtolower(trim($input->language));
+        $location = trim(preg_replace('/\s+/u', ' ', (string) $input->location));
+        $location = $location !== '' ? mb_substr($location, 0, 120) : null;
 
         if ($url === null || $domain === null || $name === '' || ! preg_match('/^[A-Z]{2}$/', $market)
             || ! in_array($language, config('mentionai.analysis_languages'), true)) {
@@ -59,12 +61,12 @@ class DefaultAnalysisStarter implements AnalysisStarter
             throw new AnalysisRejected(AnalysisRejected::RATE_LIMITED);
         }
 
-        $configHash = $this->configHash($domain, $market, $language);
+        $configHash = $this->configHash($domain, $market, $language, $location);
 
         // One lock per domain serializes the check-then-create window for every config of that domain.
         try {
-            $result = Cache::lock('analysis-start:'.sha1($domain), 15)->block(10, function () use ($input, $url, $domain, $name, $market, $language, $configHash, $ipKey) {
-                return $this->startLocked($input, $url, $domain, $name, $market, $language, $configHash, $ipKey);
+            $result = Cache::lock('analysis-start:'.sha1($domain), 15)->block(10, function () use ($input, $url, $domain, $name, $market, $location, $language, $configHash, $ipKey) {
+                return $this->startLocked($input, $url, $domain, $name, $market, $location, $language, $configHash, $ipKey);
             });
         } catch (LockTimeoutException) {
             throw new AnalysisRejected(AnalysisRejected::RATE_LIMITED);
@@ -83,7 +85,7 @@ class DefaultAnalysisStarter implements AnalysisStarter
         return $result;
     }
 
-    private function startLocked(AnalysisInput $input, string $url, string $domain, string $name, string $market, string $language, string $configHash, string $ipKey): AnalysisStartResult
+    private function startLocked(AnalysisInput $input, string $url, string $domain, string $name, string $market, ?string $location, string $language, string $configHash, string $ipKey): AnalysisStartResult
     {
         $cacheHours = (int) settings('cache_hours');
         $cached = Analysis::query()
@@ -132,6 +134,7 @@ class DefaultAnalysisStarter implements AnalysisStarter
             'website_url' => $url,
             'domain' => $domain,
             'market' => $market,
+            'location' => $location,
             'language' => $language,
             'industry' => filled($input->industry) ? trim($input->industry) : null,
             'interface_locale' => $input->interfaceLocale,
@@ -146,12 +149,16 @@ class DefaultAnalysisStarter implements AnalysisStarter
         return new AnalysisStartResult($analysis->refresh(), false);
     }
 
-    private function configHash(string $domain, string $market, string $language): string
+    private function configHash(string $domain, string $market, string $language, ?string $location): string
     {
+        // A local analysis must never reuse a country-wide one (or another city's).
         $templateIds = PromptTemplate::enabled()->pluck('id')->sort()->values()->implode(',');
 
-        return hash('sha256', implode('|', [
-            $domain, $market, $language, (int) settings('query_count'), $templateIds, config('mentionai.ai_mode'),
-        ]));
+        $parts = [$domain, $market, $language, (int) settings('query_count'), $templateIds, config('mentionai.ai_mode')];
+        if ($location !== null) {
+            $parts[] = 'location:'.TextNormalizer::fold($location);
+        }
+
+        return hash('sha256', implode('|', $parts));
     }
 }

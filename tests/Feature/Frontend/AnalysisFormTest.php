@@ -15,6 +15,7 @@ class AnalysisFormTest extends FrontendTestCase
             ->set('companyName', 'Axiontic')
             ->set('websiteUrl', 'axiontic.com')
             ->set('market', 'RO')
+            ->set('location', ' Cluj-Napoca ')
             ->set('industry', 'Software Development')
             ->set('language', 'ro');
     }
@@ -76,8 +77,20 @@ class AnalysisFormTest extends FrontendTestCase
         $this->assertSame('RO', $input->market);
         $this->assertSame('ro', $input->language);
         $this->assertSame('Software Development', $input->industry);
+        $this->assertSame('Cluj-Napoca', $input->location);
         $this->assertSame('en', $input->interfaceLocale);
         $this->assertNull($input->turnstileToken);
+    }
+
+    public function test_location_is_optional_and_length_limited(): void
+    {
+        $this->starter->analysis = Analysis::factory()->create();
+
+        $this->filled()->set('location', str_repeat('a', 121))->call('submit')->assertHasErrors(['location' => 'max']);
+        $this->filled()->set('location', '')->call('submit')->assertHasNoErrors();
+        $this->assertNull($this->starter->received->location);
+
+        $this->get('/ro')->assertSee('Oraș / județ / regiune');
     }
 
     public function test_turnstile_token_is_required_and_forwarded_when_configured(): void
