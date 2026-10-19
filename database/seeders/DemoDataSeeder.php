@@ -65,6 +65,8 @@ class DemoDataSeeder extends Seeder
             };
         });
 
+        $analyses->push($this->audit($analyses[1]));
+
         $analyses->each(fn (Analysis $analysis) => $this->usageLogs($analysis));
 
         $this->leads($analyses);
@@ -78,6 +80,21 @@ class DemoDataSeeder extends Seeder
         $analysis->update(['visibility_score' => $scores[($index * 5) % count($scores)]]);
 
         return $analysis;
+    }
+
+    /** A completed demo GEO audit started from a completed RO demo check. */
+    private function audit(Analysis $check): Analysis
+    {
+        return Analysis::factory()->audit()->demo()->create([
+            'parent_analysis_id' => $check->id,
+            'company_id' => $check->company_id,
+            'company_name' => $check->company_name,
+            'domain' => $check->domain,
+            'website_url' => $check->website_url,
+            'market' => $check->market,
+            'language' => $check->language,
+            'created_at' => $check->created_at->copy()->addHour(),
+        ]);
     }
 
     private function usageLogs(Analysis $analysis): void

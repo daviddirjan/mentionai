@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Analyses\Pages;
 use App\Contracts\AnalysisMaintenance;
 use App\Enums\ResponseStatus;
 use App\Filament\Resources\Analyses\AnalysisResource;
+use App\Filament\Resources\Analyses\Tables\AnalysesTable;
 use App\Models\Analysis;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -20,6 +21,7 @@ class ViewAnalysis extends ViewRecord
     protected function resolveRecord(int|string $key): Model
     {
         return parent::resolveRecord($key)->load([
+            'parent:id,uuid',
             'competitors',
             'usageLogs',
             'questions.responses.brandMention',
@@ -52,6 +54,8 @@ class ViewAnalysis extends ViewRecord
                     Notification::make()->success()->title('Score recalculated')->send();
                     $this->refreshRecord();
                 }),
+            AnalysesTable::downloadReportAction(),
+            AnalysesTable::renderReportAction()->after(fn () => $this->refreshRecord()),
             DeleteAction::make()
                 ->modalDescription('This permanently deletes the analysis with all its questions, responses and competitors.')
                 ->successRedirectUrl(AnalysisResource::getUrl('index')),

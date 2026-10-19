@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\AnalysisTier;
 use App\Models\Analysis;
 use App\Models\ApiUsageLog;
 use App\Models\Lead;
@@ -26,6 +27,7 @@ class StatsOverview extends StatsOverviewWidget
                 ->description($demoAnalyses.' demo'),
             Stat::make('Analyses today', Analysis::where('created_at', '>=', now()->startOfDay())->count()),
             Stat::make('Analyses this month', Analysis::where('created_at', '>=', now()->startOfMonth())->count()),
+            Stat::make('GEO audits (30 days)', Analysis::where('tier', AnalysisTier::Audit->value)->where('created_at', '>=', now()->subDays(30))->count()),
             Stat::make('Total leads', Lead::count()),
             Stat::make('Leads this month', Lead::where('created_at', '>=', now()->startOfMonth())->count()),
             Stat::make('Average visibility score', $average === null ? 'n/a' : number_format((float) $average, 1).'%'),

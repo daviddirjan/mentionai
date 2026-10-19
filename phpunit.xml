@@ -32,5 +32,11 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- Tests must never reach real providers: blank every key and force mock mode. -->
+        <env name="MENTIONAI_AI_MODE" value="mock" force="true"/>
+        <env name="OPENAI_API_KEY" value="" force="true"/>
+        <env name="GEMINI_API_KEY" value="" force="true"/>
+        <env name="ANTHROPIC_API_KEY" value="" force="true"/>
+        <env name="PERPLEXITY_API_KEY" value="" force="true"/>
     </php>
 </phpunit>
