@@ -166,7 +166,7 @@ return [
         'summary_failed' => ':failed tests mislukten om technische redenen en tellen niet mee in de score.',
         'summary_method' => 'Elke vraag is gesteld zonder de bedrijfsnaam te noemen; alleen expliciete aanbevelingen tellen.',
         'h1' => ':industry in :place',
-        'title' => ':industry :place | :domain',
+        'title' => ':industry :place',
         'meta_description' => ':industry in :place — diensten en contactgegevens op :domain.',
         'demo_prefix' => 'Demo:',
     ],

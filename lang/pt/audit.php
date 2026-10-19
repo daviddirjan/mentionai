@@ -166,7 +166,7 @@ return [
         'summary_failed' => ':failed testes falharam por motivos técnicos e estão excluídos da pontuação.',
         'summary_method' => 'Cada pergunta foi feita sem nomear a empresa; só contam as recomendações explícitas.',
         'h1' => ':industry em :place',
-        'title' => ':industry :place | :domain',
+        'title' => ':industry :place',
         'meta_description' => ':industry em :place — serviços e contactos em :domain.',
         'demo_prefix' => 'Demo:',
     ],

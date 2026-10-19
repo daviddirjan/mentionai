@@ -166,7 +166,7 @@ return [
         'summary_failed' => ':failed test non sono riusciti per motivi tecnici e sono esclusi dal punteggio.',
         'summary_method' => 'Ogni domanda è stata posta senza nominare l’azienda; contano solo i consigli espliciti.',
         'h1' => ':industry a :place',
-        'title' => ':industry :place | :domain',
+        'title' => ':industry :place',
         'meta_description' => ':industry a :place — servizi e contatti su :domain.',
         'demo_prefix' => 'Demo:',
     ],

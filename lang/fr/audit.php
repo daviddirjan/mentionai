@@ -166,7 +166,7 @@ return [
         'summary_failed' => ':failed tests ont échoué pour des raisons techniques et sont exclus du score.',
         'summary_method' => 'Chaque question a été posée sans nommer l’entreprise ; seules les recommandations explicites comptent.',
         'h1' => ':industry à :place',
-        'title' => ':industry :place | :domain',
+        'title' => ':industry :place',
         'meta_description' => ':industry à :place — services et coordonnées sur :domain.',
         'demo_prefix' => 'Démo :',
     ],

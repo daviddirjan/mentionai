@@ -168,7 +168,7 @@ return [
         'summary_failed' => ':failed tests failed for technical reasons and are excluded from the score.',
         'summary_method' => 'Every question was asked without naming the company; only explicit recommendations count.',
         'h1' => ':industry in :place',
-        'title' => ':industry :place | :domain',
+        'title' => ':industry :place',
         'meta_description' => ':industry in :place — services and contact details on :domain.',
         'demo_prefix' => 'Demo:',
     ],

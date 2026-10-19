@@ -166,7 +166,7 @@ return [
         'summary_failed' => 'Testy nieudane z przyczyn technicznych (:failed) są wyłączone z wyniku.',
         'summary_method' => 'Każde pytanie zadano bez podawania nazwy firmy; liczą się tylko wyraźne rekomendacje.',
         'h1' => ':industry w :place',
-        'title' => ':industry :place | :domain',
+        'title' => ':industry :place',
         'meta_description' => ':industry w :place — usługi i dane kontaktowe na :domain.',
         'demo_prefix' => 'Demo:',
     ],

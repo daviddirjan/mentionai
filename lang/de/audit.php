@@ -166,7 +166,7 @@ return [
         'summary_failed' => ':failed Tests sind aus technischen Gründen fehlgeschlagen und vom Score ausgeschlossen.',
         'summary_method' => 'Jede Frage wurde ohne Nennung des Unternehmens gestellt; nur ausdrückliche Empfehlungen zählen.',
         'h1' => ':industry in :place',
-        'title' => ':industry :place | :domain',
+        'title' => ':industry :place',
         'meta_description' => ':industry in :place — Leistungen und Kontaktdaten auf :domain.',
         'demo_prefix' => 'Demo:',
     ],

@@ -166,7 +166,7 @@ return [
         'summary_failed' => ':failed teste au eșuat din motive tehnice și sunt excluse din scor.',
         'summary_method' => 'Fiecare întrebare a fost pusă fără a numi firma; contează doar recomandările explicite.',
         'h1' => ':industry în :place',
-        'title' => ':industry :place | :domain',
+        'title' => ':industry :place',
         'meta_description' => ':industry în :place — servicii și date de contact pe :domain.',
         'demo_prefix' => 'Demo:',
     ],
