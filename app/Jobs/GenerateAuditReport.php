@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
-/** Renders the GEO audit PDF, then mails the audit's latest lead a signed download link. */
+/** Renders the GEO audit PDF, then mails the audit's latest lead a signed download link (first report only). */
 class GenerateAuditReport implements ShouldQueue
 {
     use Queueable;
@@ -24,7 +24,8 @@ class GenerateAuditReport implements ShouldQueue
 
     public int $timeout = 180;
 
-    public function __construct(public int $analysisId) {}
+    /** @param  bool  $notify  mail the latest lead even when a report already existed (a new lead reused a finished audit) */
+    public function __construct(public int $analysisId, public bool $notify = false) {}
 
     public function handle(ReportRenderer $renderer): void
     {
@@ -33,10 +34,12 @@ class GenerateAuditReport implements ShouldQueue
             return;
         }
 
+        // An admin retry re-renders the PDF with fresh data but must not email the visitor a second time.
+        $firstReport = $this->notify || ! $audit->hasReport();
         $renderer->render($audit);
 
         $lead = $audit->leads()->whereNotNull('email')->latest('id')->first();
-        if ($lead === null || blank($lead->email)) {
+        if (! $firstReport || $lead === null || blank($lead->email)) {
             return;
         }
 

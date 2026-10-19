@@ -61,7 +61,7 @@ final class RobotsTxt
 
     /**
      * @return array{allowed: bool, group: ?string, rule: ?string} group is the matched user-agent ("*" or the bot token),
-     *                                                              rule the deciding line (e.g. "Disallow: /")
+     *                                                             rule the deciding line (e.g. "Disallow: /")
      */
     public function evaluate(string $agent, string $path = '/'): array
     {

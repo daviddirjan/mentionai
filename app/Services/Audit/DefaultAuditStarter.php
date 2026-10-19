@@ -8,6 +8,7 @@ use App\Data\AnalysisStartResult;
 use App\Enums\AnalysisStatus;
 use App\Enums\AnalysisTier;
 use App\Exceptions\AnalysisRejected;
+use App\Jobs\GenerateAuditReport;
 use App\Models\Analysis;
 use App\Models\Lead;
 use App\Services\Analysis\StartLimits;
@@ -70,6 +71,11 @@ class DefaultAuditStarter implements AuditStarter
         });
 
         $lead->update(['analysis_id' => $result->analysis->id]);
+
+        // A finished audit reused for a new lead still owes that lead its email; an in-flight one mails at completion.
+        if ($result->reused && $result->analysis->status === AnalysisStatus::Completed) {
+            GenerateAuditReport::dispatch($result->analysis->id, notify: true);
+        }
 
         return $this->limits->dispatch($result);
     }
