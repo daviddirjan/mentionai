@@ -26,6 +26,7 @@ class DompdfReportRenderer implements ReportRenderer
         // No remote fetches: the PDF must never load URLs that came from the analysed site or AI answers.
         $pdf = Pdf::setOption([
             'isRemoteEnabled' => false,
+            'isFontSubsettingEnabled' => true,
             'chroot' => base_path(),
             'fontDir' => $fonts,
             'fontCache' => $fonts,
