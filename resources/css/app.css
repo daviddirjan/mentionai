@@ -4,48 +4,52 @@
 @source '../views';
 @source '../../app/Livewire';
 
-/* Semantic tokens. Dark is the default; [data-theme='light'] overrides. */
+/* Axiontic semantic tokens. Light is the default; [data-theme='dark'] overrides. */
 :root {
-    color-scheme: dark;
-    --bg: #09090b;
-    --bg-soft: #0f0f13;
-    --surface: #131318;
-    --surface-2: #1a1a21;
-    --line: rgb(255 255 255 / 0.08);
-    --line-strong: rgb(255 255 255 / 0.16);
-    --fg: #fafafa;
-    --fg-muted: #a1a1aa;
-    --fg-subtle: #71717a;
-    --accent: #6d7cff;
-    --accent-2: #a279ff;
+    color-scheme: light;
+    --bg: #fbfaf7;
+    --bg-soft: #f2f0eb;
+    --surface: #ffffff;
+    --surface-2: #f6f5f1;
+    --line: rgb(27 48 48 / 0.1);
+    --line-strong: rgb(27 48 48 / 0.2);
+    --fg: #1b3030;
+    --fg-muted: #5b6b6b;
+    --fg-subtle: #8a9696;
+    --accent: #1b3030;
+    --accent-2: #2d4a4a;
     --accent-fg: #ffffff;
-    --good: #34d399;
-    --warn: #fbbf24;
-    --bad: #f87171;
-    --glow: rgb(109 124 255 / 0.18);
+    --signal: #21d789;
+    --good: #21a86b;
+    --warn: #c98a12;
+    --bad: #c0392b;
+    --focus: #1b3030;
 }
 
-[data-theme='light'] {
-    color-scheme: light;
-    --bg: #fafafa;
-    --bg-soft: #f4f4f6;
-    --surface: #ffffff;
-    --surface-2: #f4f4f6;
-    --line: rgb(9 9 11 / 0.09);
-    --line-strong: rgb(9 9 11 / 0.18);
-    --fg: #09090b;
-    --fg-muted: #52525b;
-    --fg-subtle: #71717a;
-    --accent: #4f5bf0;
-    --accent-2: #7c4dff;
-    --good: #059669;
-    --warn: #b45309;
-    --bad: #dc2626;
-    --glow: rgb(79 91 240 / 0.12);
+[data-theme='dark'] {
+    color-scheme: dark;
+    --bg: #162626;
+    --bg-soft: #1a2b2b;
+    --surface: #1f2e2f;
+    --surface-2: #253637;
+    --line: rgb(238 243 241 / 0.1);
+    --line-strong: rgb(238 243 241 / 0.2);
+    --fg: #eef3f1;
+    --fg-muted: #a9b8b5;
+    --fg-subtle: #7f908d;
+    --accent: #21d789;
+    --accent-2: #5fe3aa;
+    --accent-fg: #102020;
+    --signal: #21d789;
+    --good: #3ccf8a;
+    --warn: #e3ac3a;
+    --bad: #ef6b5b;
+    --focus: #21d789;
 }
 
 @theme inline {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    --font-sans: 'Afacad', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --color-bg: var(--bg);
     --color-bg-soft: var(--bg-soft);
     --color-surface: var(--surface);
@@ -57,10 +61,12 @@
     --color-subtle: var(--fg-subtle);
     --color-accent: var(--accent);
     --color-accent-2: var(--accent-2);
+    --color-accent-fg: var(--accent-fg);
+    --color-signal: var(--signal);
     --color-good: var(--good);
     --color-warn: var(--warn);
     --color-bad: var(--bad);
-    --radius-card: 1.25rem;
+    --radius-card: 1rem;
 }
 
 @layer base {
@@ -73,35 +79,57 @@
         background: var(--bg);
         color: var(--fg);
         font-family: var(--font-sans);
+        font-size: 1.0625rem;
+        line-height: 1.55;
         -webkit-font-smoothing: antialiased;
         transition: background-color 0.2s ease, color 0.2s ease;
     }
 
+    h1,
+    h2,
+    h3 {
+        letter-spacing: -0.015em;
+        text-wrap: balance;
+    }
+
     :focus-visible {
-        outline: 2px solid var(--accent);
+        outline: 2px solid var(--focus);
         outline-offset: 2px;
     }
 
     summary::-webkit-details-marker {
         display: none;
     }
+
+    [x-cloak] {
+        display: none !important;
+    }
 }
 
 @layer components {
-    .bg-grid {
-        background-image:
-            radial-gradient(60rem 28rem at 50% -10%, var(--glow), transparent 70%),
-            linear-gradient(var(--line) 1px, transparent 1px),
-            linear-gradient(90deg, var(--line) 1px, transparent 1px);
-        background-size: auto, 56px 56px, 56px 56px;
-        mask-image: linear-gradient(to bottom, #000 40%, transparent);
+    /* Ink headline with a short signal underline instead of gradient text. */
+    .signal-underline {
+        background-image: linear-gradient(var(--signal), var(--signal));
+        background-repeat: no-repeat;
+        background-size: 100% 0.14em;
+        background-position: 0 92%;
+        padding-bottom: 0.04em;
     }
 
-    .text-gradient {
-        background-image: linear-gradient(120deg, var(--fg) 20%, var(--accent) 60%, var(--accent-2));
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+    .eyebrow {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+    }
+
+    .signal-dot {
+        display: inline-block;
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 9999px;
+        background: var(--signal);
     }
 
     .prose-ai p + p,
@@ -127,8 +155,9 @@
     }
 
     .prose-ai a {
-        color: var(--accent);
+        color: var(--fg);
         text-decoration: underline;
+        text-decoration-color: var(--signal);
         text-underline-offset: 3px;
     }
 

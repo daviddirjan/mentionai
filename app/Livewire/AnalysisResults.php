@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Contracts\AuditReportBuilder;
+use App\Data\AuditReport;
 use App\Enums\AnalysisStatus;
 use App\Enums\ProviderSlug;
 use App\Enums\ResponseStatus;
@@ -17,16 +19,6 @@ class AnalysisResults extends Component
     use UsesLocale;
 
     public const LOW_SCORE_THRESHOLD = 50;
-
-    /** Status steps shown while running, in pipeline order. */
-    public const PROGRESS_STEPS = [
-        AnalysisStatus::Pending,
-        AnalysisStatus::InspectingWebsite,
-        AnalysisStatus::GeneratingQuestions,
-        AnalysisStatus::QueryingProviders,
-        AnalysisStatus::Analyzing,
-        AnalysisStatus::Scoring,
-    ];
 
     #[Locked]
     public string $uuid = '';
@@ -92,11 +84,49 @@ class AnalysisResults extends Component
         })->all();
     }
 
+    /** @return list<AnalysisStatus> steps shown while running (the final "completed" step is the result itself) */
+    public function progressSteps(): array
+    {
+        return array_values(array_filter(
+            AnalysisStatus::progressSteps($this->analysis->tier),
+            fn (AnalysisStatus $step) => $step !== AnalysisStatus::Completed,
+        ));
+    }
+
     public function stepIndex(): int
     {
-        $index = array_search($this->analysis->status, self::PROGRESS_STEPS, true);
+        // inspecting_website is not a listed step; it belongs to the start of the pipeline.
+        $index = array_search($this->analysis->status, $this->progressSteps(), true);
 
         return $index === false ? 0 : $index;
+    }
+
+    /** Assembled from stored data only; null until a completed audit exists. */
+    #[Computed]
+    public function report(): ?AuditReport
+    {
+        $analysis = $this->analysis;
+
+        if (! $analysis->isAudit() || $analysis->status !== AnalysisStatus::Completed) {
+            return null;
+        }
+
+        return app(AuditReportBuilder::class)->build($analysis);
+    }
+
+    public function hasReportAccess(): bool
+    {
+        return session("audit_access.{$this->uuid}") === true;
+    }
+
+    public function auditEnabled(): bool
+    {
+        return (bool) settings('audit_enabled', true);
+    }
+
+    public function auditTests(): int
+    {
+        return (int) settings('audit_query_count', 25) * count(ProviderSlug::cases());
     }
 
     public function render(): View

@@ -1,17 +1,18 @@
-<section class="relative overflow-hidden">
-    <div class="bg-grid pointer-events-none absolute inset-0" aria-hidden="true"></div>
-    <div class="relative mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pt-24">
-        <div class="mx-auto max-w-3xl text-center">
-            <x-ui.badge tone="accent" class="mb-6"><x-lucide-sparkles class="size-3.5" /> {{ __('site.hero.badge') }}</x-ui.badge>
-            <h1 class="text-gradient text-4xl font-semibold tracking-tight sm:text-6xl">{{ __('site.hero.title') }}</h1>
-            <p class="mx-auto mt-6 max-w-2xl text-lg text-muted sm:text-xl">{{ __('site.hero.description') }}</p>
-            <div class="mt-8 flex flex-col items-center gap-3">
-                <x-ui.button href="#analyze" size="lg">{{ __('site.hero.cta') }} <x-lucide-arrow-down class="size-5" /></x-ui.button>
-                <p class="text-sm text-subtle">{{ __('site.hero.note') }}</p>
-            </div>
+<section class="relative">
+    <div class="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+        <div>
+            <p class="eyebrow inline-flex items-center gap-2"><span class="signal-dot" aria-hidden="true"></span>{{ __('site.hero.badge') }}</p>
+            <h1 class="mt-5 text-[2.6rem] font-semibold leading-[1.05] text-fg sm:text-6xl">{{ __('site.hero.title') }}</h1>
+            <p class="mt-6 max-w-xl text-lg text-muted sm:text-xl">{{ __('site.hero.description') }}</p>
+
+            <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[0.95rem] text-muted">
+                @foreach (trans('site.hero.points') as $point)
+                    <li class="inline-flex items-center gap-2"><x-lucide-check class="size-4 text-good" /> {{ $point }}</li>
+                @endforeach
+            </ul>
         </div>
 
-        <div class="mx-auto mt-14 max-w-3xl">
+        <div>
             <livewire:analysis-form />
         </div>
     </div>

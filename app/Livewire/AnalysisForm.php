@@ -27,6 +27,9 @@ class AnalysisForm extends Component
 
     public string $language = '';
 
+    /** Once the visitor picks a language, the country no longer changes it. */
+    public bool $languageTouched = false;
+
     public string $turnstileToken = '';
 
     /** Honeypot: real visitors never see or fill this. */
@@ -40,6 +43,30 @@ class AnalysisForm extends Component
     {
         $locale = app()->getLocale();
         $this->language = in_array($locale, config('mentionai.analysis_languages'), true) ? $locale : 'en';
+    }
+
+    /** Default analysis language per market; anything else falls back to English. */
+    private const MARKET_LANGUAGES = [
+        'RO' => 'ro', 'MD' => 'ro', 'DE' => 'de', 'AT' => 'de', 'CH' => 'de', 'LI' => 'de', 'ES' => 'es', 'MX' => 'es',
+        'AR' => 'es', 'CL' => 'es', 'CO' => 'es', 'PE' => 'es', 'UY' => 'es', 'FR' => 'fr', 'BE' => 'fr', 'LU' => 'fr',
+        'MC' => 'fr', 'IT' => 'it', 'PT' => 'pt', 'BR' => 'pt', 'NL' => 'nl', 'PL' => 'pl',
+    ];
+
+    public function updatedMarket(string $value): void
+    {
+        if ($this->languageTouched) {
+            return;
+        }
+
+        $language = self::MARKET_LANGUAGES[$value] ?? 'en';
+        if (in_array($language, config('mentionai.analysis_languages'), true)) {
+            $this->language = $language;
+        }
+    }
+
+    public function updatedLanguage(): void
+    {
+        $this->languageTouched = true;
     }
 
     protected function rules(): array

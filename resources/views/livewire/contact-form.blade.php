@@ -31,7 +31,7 @@
                     <span wire:loading.remove wire:target="submit" class="inline-flex items-center gap-2"><x-lucide-mail class="size-4" /> {{ __('site.contact.send') }}</span>
                     <span wire:loading wire:target="submit" class="inline-flex items-center gap-2"><x-lucide-loader-circle class="size-4 animate-spin" /> {{ __('site.contact.sending') }}</span>
                 </x-ui.button>
-                <p class="mt-3 text-xs text-subtle">{{ __('site.contact.privacy') }}
+                <p class="mt-3 text-xs text-muted">{{ __('site.contact.privacy') }}
                     <a class="underline underline-offset-2 hover:text-fg" href="{{ route('privacy') }}">{{ __('site.form.privacy_link') }}</a>
                 </p>
             </div>

@@ -29,11 +29,10 @@
 
 <x-layouts.app :schema="$schema">
     @include('sections.hero')
-    @include('sections.how')
     @include('sections.platforms')
-    @include('sections.why')
+    @include('sections.compare')
+    @include('sections.how')
     @include('sections.example')
-    @include('sections.features')
     @include('sections.pricing')
     @include('sections.faq')
     @include('sections.contact')

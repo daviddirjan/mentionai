@@ -2,7 +2,9 @@
 
 namespace App\Livewire;
 
+use App\Contracts\AuditStarter;
 use App\Enums\LeadStatus;
+use App\Exceptions\AnalysisRejected;
 use App\Livewire\Concerns\UsesLocale;
 use App\Mail\LeadReceived;
 use App\Mail\NewLeadNotification;
@@ -19,8 +21,16 @@ class LeadForm extends Component
 {
     use UsesLocale;
 
+    public const MODES = ['expert', 'audit', 'unlock'];
+
     #[Locked]
     public string $analysisUuid = '';
+
+    /** expert: contact request; audit: email that starts a GEO audit from a check; unlock: email that unlocks an audit PDF. */
+    #[Locked]
+    public string $mode = 'expert';
+
+    public ?string $rejection = null;
 
     public string $name = '';
 
@@ -39,9 +49,10 @@ class LeadForm extends Component
 
     public bool $sent = false;
 
-    public function mount(string $analysisUuid, string $company = '', string $website = ''): void
+    public function mount(string $analysisUuid, string $company = '', string $website = '', string $mode = 'expert'): void
     {
         $this->analysisUuid = $analysisUuid;
+        $this->mode = in_array($mode, self::MODES, true) ? $mode : 'expert';
         $this->company = $company;
         $this->website = $website;
     }
@@ -56,6 +67,13 @@ class LeadForm extends Component
 
     protected function rules(): array
     {
+        if ($this->mode !== 'expert') {
+            return [
+                'name' => ['nullable', 'string', 'max:120'],
+                'email' => ['required', 'email:rfc', 'max:190'],
+            ];
+        }
+
         return [
             'name' => ['required', 'string', 'max:120'],
             'company' => ['nullable', 'string', 'max:160'],
@@ -98,6 +116,12 @@ class LeadForm extends Component
 
         $analysis = Analysis::where('uuid', $this->analysisUuid)->first();
 
+        if ($this->mode !== 'expert') {
+            $this->submitAudit($analysis);
+
+            return;
+        }
+
         $lead = Lead::create([
             'analysis_id' => $analysis?->id,
             'name' => trim($this->name),
@@ -117,6 +141,49 @@ class LeadForm extends Component
         Mail::to($lead->email)->queue(new LeadReceived($lead));
 
         $this->sent = true;
+    }
+
+    private function submitAudit(?Analysis $analysis): void
+    {
+        $this->rejection = null;
+
+        if (! $analysis || ($this->mode === 'unlock' && ! $analysis->isAudit())) {
+            $this->rejection = AnalysisRejected::NOT_ELIGIBLE;
+
+            return;
+        }
+
+        // The leads table requires a name; the audit form keeps it optional.
+        $lead = Lead::create([
+            'analysis_id' => $analysis->id,
+            'name' => trim($this->name),
+            'company' => $analysis->company_name,
+            'email' => trim($this->email),
+            'website' => $analysis->website_url,
+            'message' => __('site.lead.audit_message'),
+            'status' => LeadStatus::New,
+            'locale' => $this->locale,
+            'ip_hash' => $this->ipHash(),
+        ]);
+
+        if ($adminEmail = config('mentionai.admin_email')) {
+            Mail::to($adminEmail)->queue(new NewLeadNotification($lead));
+        }
+
+        $audit = $analysis;
+        if ($this->mode === 'audit') {
+            try {
+                $audit = app(AuditStarter::class)->start($analysis, $lead, (string) request()->ip())->analysis;
+            } catch (AnalysisRejected $e) {
+                $this->rejection = $e->reason;
+
+                return;
+            }
+        }
+
+        session()->put("audit_access.{$audit->uuid}", true);
+        $this->sent = true;
+        $this->redirectRoute('analysis.show', ['analysis' => $audit->uuid], navigate: false);
     }
 
     public function render(): View

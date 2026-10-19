@@ -24,7 +24,7 @@ class NewLeadNotification extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('site.mail.new_lead_subject', ['name' => $this->lead->name]),
+            subject: __('site.mail.new_lead_subject', ['name' => $this->lead->name !== '' ? $this->lead->name : $this->lead->email]),
             replyTo: [$this->lead->email],
         );
     }

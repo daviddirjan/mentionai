@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SeoController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
@@ -8,6 +9,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PageController::class, 'redirectToLocale'])->name('root');
 Route::get('sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('robots.txt', [SeoController::class, 'robots'])->name('robots');
+Route::get('report/{analysis:uuid}.pdf', [ReportController::class, 'download'])
+    ->whereUuid('analysis')
+    ->middleware('throttle:30,1')
+    ->name('report.download');
 
 Route::prefix('{locale}')
     ->whereIn('locale', config('mentionai.locales'))
