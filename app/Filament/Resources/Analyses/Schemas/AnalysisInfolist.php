@@ -2,15 +2,21 @@
 
 namespace App\Filament\Resources\Analyses\Schemas;
 
+use App\Enums\CheckStatus;
 use App\Enums\MentionClassification;
+use App\Enums\Priority;
 use App\Enums\ResponseStatus;
+use App\Filament\Resources\Analyses\AnalysisResource;
+use App\Filament\Resources\Analyses\Tables\AnalysesTable;
 use App\Models\AiResponse;
 use App\Models\Analysis;
 use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\RepeatableEntry\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontFamily;
 
 class AnalysisInfolist
 {
@@ -36,6 +42,8 @@ class AnalysisInfolist
                 TextEntry::make('completed_at')->dateTime()->placeholder('n/a'),
                 TextEntry::make('error_message')->placeholder('none')->columnSpan(2),
             ]),
+
+            ...self::auditSections(),
 
             Section::make('Website inspection')->collapsible()->collapsed()->schema([
                 ViewEntry::make('website_inspection')->label('')->view('filament.analysis.json')
@@ -121,5 +129,120 @@ class AnalysisInfolist
                 ]),
             ]),
         ]);
+    }
+
+    /** @return list<Section> */
+    private static function auditSections(): array
+    {
+        $isAudit = fn (Analysis $record) => $record->isAudit();
+
+        return [
+            Section::make('GEO audit')->columns(4)->visible($isAudit)->schema([
+                TextEntry::make('tier')->badge()->color('primary')
+                    ->formatStateUsing(fn ($state) => AnalysesTable::tierOptions()[$state->value]),
+                TextEntry::make('parent_check')->label('Started from check')
+                    ->state(fn (Analysis $record) => $record->parent?->uuid)
+                    ->url(fn (Analysis $record) => $record->parent ? AnalysisResource::getUrl('view', ['record' => $record->parent]) : null)
+                    ->fontFamily(FontFamily::Mono)->placeholder('n/a'),
+                TextEntry::make('report_generated_at')->label('Report generated at')->dateTime()->placeholder('not generated'),
+            ]),
+
+            Section::make('Technical checks')->visible($isAudit)->collapsible()->schema([
+                RepeatableEntry::make('site_checks_list')->label('')
+                    ->state(fn (Analysis $record) => collect($record->siteChecks())->map(fn ($c) => [
+                        'group' => $c->group->value,
+                        'key' => $c->key,
+                        'status' => $c->status,
+                        'evidence' => $c->evidence,
+                        'params' => self::params($c->params),
+                    ])->all())
+                    ->table([
+                        TableColumn::make('Group'),
+                        TableColumn::make('Check'),
+                        TableColumn::make('Status'),
+                        TableColumn::make('Evidence'),
+                        TableColumn::make('Params'),
+                    ])
+                    ->schema([
+                        TextEntry::make('group')->badge()->color('gray'),
+                        TextEntry::make('key')->fontFamily(FontFamily::Mono),
+                        TextEntry::make('status')->badge()
+                            ->formatStateUsing(fn (CheckStatus $state) => $state->value)
+                            ->color(fn (CheckStatus $state) => match ($state) {
+                                CheckStatus::Pass => 'success',
+                                CheckStatus::Warn => 'warning',
+                                CheckStatus::Fail => 'danger',
+                                CheckStatus::Info => 'gray',
+                            }),
+                        TextEntry::make('evidence')->fontFamily(FontFamily::Mono),
+                        TextEntry::make('params')->fontFamily(FontFamily::Mono)->placeholder('—'),
+                    ])
+                    ->placeholder('No technical checks recorded'),
+            ]),
+
+            Section::make('Recommendations')->visible($isAudit)->collapsible()->schema([
+                RepeatableEntry::make('recommendations_list')->label('')
+                    ->state(fn (Analysis $record) => collect($record->recommendationList())->map(fn ($r) => [
+                        'priority' => $r->priority,
+                        'window' => $r->window.' days',
+                        'key' => $r->key,
+                        'source' => $r->source,
+                        'params' => self::params($r->params),
+                    ])->all())
+                    ->table([
+                        TableColumn::make('Priority'),
+                        TableColumn::make('Window'),
+                        TableColumn::make('Recommendation'),
+                        TableColumn::make('Source'),
+                        TableColumn::make('Params'),
+                    ])
+                    ->schema([
+                        TextEntry::make('priority')->badge()
+                            ->formatStateUsing(fn (Priority $state) => $state->label())
+                            ->color(fn (Priority $state) => match ($state) {
+                                Priority::P0 => 'danger',
+                                Priority::P1 => 'warning',
+                                Priority::P2 => 'gray',
+                            }),
+                        TextEntry::make('window'),
+                        TextEntry::make('key')->fontFamily(FontFamily::Mono),
+                        TextEntry::make('source')->fontFamily(FontFamily::Mono),
+                        TextEntry::make('params')->fontFamily(FontFamily::Mono)->placeholder('—'),
+                    ])
+                    ->placeholder('No recommendations recorded'),
+            ]),
+
+            Section::make('Narrative')->visible($isAudit)->collapsible()->columns(2)->schema([
+                TextEntry::make('narrative_source')->label('Source')->badge()
+                    ->state(fn (Analysis $record) => $record->auditNarrative()?->source)
+                    ->formatStateUsing(fn (string $state) => $state === 'demo' ? 'DEMO' : $state)
+                    ->color(fn (string $state) => match ($state) {
+                        'demo' => 'warning',
+                        'ai' => 'success',
+                        default => 'gray',
+                    })
+                    ->placeholder('not generated'),
+                TextEntry::make('narrative_verdict')->label('Verdict')->columnSpanFull()
+                    ->state(fn (Analysis $record) => $record->auditNarrative()?->verdict)->placeholder('n/a'),
+                TextEntry::make('narrative_summary')->label('Summary')->columnSpanFull()->listWithLineBreaks()->bulleted()
+                    ->state(fn (Analysis $record) => $record->auditNarrative()?->summary ?? [])->placeholder('n/a'),
+                TextEntry::make('narrative_h1')->label('Proposed H1')
+                    ->state(fn (Analysis $record) => $record->auditNarrative()?->h1)->placeholder('n/a'),
+                TextEntry::make('narrative_title')->label('Proposed title')
+                    ->state(fn (Analysis $record) => $record->auditNarrative()?->title)->placeholder('n/a'),
+                TextEntry::make('narrative_meta')->label('Proposed meta description')->columnSpanFull()
+                    ->state(fn (Analysis $record) => $record->auditNarrative()?->metaDescription)->placeholder('n/a'),
+            ]),
+        ];
+    }
+
+    /** @param  array<string, scalar|null>  $params */
+    private static function params(array $params): ?string
+    {
+        if ($params === []) {
+            return null;
+        }
+
+        return collect($params)->map(fn ($v, $k) => $k.'='.(is_bool($v) ? var_export($v, true) : (string) $v))->implode(', ');
     }
 }
