@@ -32,10 +32,16 @@ class SpendingGuard
         }
 
         $spent = (float) Analysis::query()->whereKey($analysis->getKey())->value('estimated_cost');
-        if ($spent >= (float) settings('max_cost_per_analysis')) {
+        if ($spent >= $this->maxCostFor($analysis)) {
             return 'budget_exceeded';
         }
 
         return null;
+    }
+
+    /** Per-analysis cost cap: audits run ~8x the calls of a free check and have their own cap. */
+    public function maxCostFor(Analysis $analysis): float
+    {
+        return (float) settings($analysis->isAudit() ? 'max_cost_per_audit' : 'max_cost_per_analysis');
     }
 }
