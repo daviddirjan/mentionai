@@ -5,9 +5,7 @@ namespace App\Services\Inspection;
 use Closure;
 use DOMDocument;
 use DOMXPath;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Throwable;
 
 /**
  * Fetches a homepage defensively (SSRF-safe) and extracts identity hints.
@@ -15,146 +13,25 @@ use Throwable;
  */
 class WebsiteInspector
 {
-    /** @var Closure(string): list<string> */
-    private Closure $resolver;
+    private SafeFetcher $fetcher;
 
     /** @param  (Closure(string): list<string>)|null  $resolver host => list of IP addresses; injectable for tests */
     public function __construct(?Closure $resolver = null)
     {
-        $this->resolver = $resolver ?? fn (string $host): array => $this->resolveDns($host);
+        $this->fetcher = new SafeFetcher($resolver);
     }
 
     /** @return array<string, mixed> */
     public function inspect(string $url): array
     {
-        $config = config('mentionai.website_inspection');
-        $deadline = microtime(true) + (float) $config['timeout_seconds'];
-        $current = $url;
-        $maxBytes = (int) $config['max_bytes'];
-        $tooLarge = false;
+        $result = $this->fetcher->get($url, ['content_types' => ['text/html', 'application/xhtml']]);
 
-        try {
-            for ($hop = 0; $hop <= (int) $config['max_redirects']; $hop++) {
-                $target = $this->validate($current);
-                $remaining = max(1.0, $deadline - microtime(true));
-                if ($remaining <= 1.0 && microtime(true) >= $deadline) {
-                    return $this->failure($url, 'timeout');
-                }
-
-                $response = Http::withHeaders(['User-Agent' => $config['user_agent'], 'Accept' => 'text/html,application/xhtml+xml'])
-                    ->timeout((int) ceil($remaining))
-                    ->withOptions([
-                        'allow_redirects' => false,
-                        // Abort mid-transfer once the cap is passed; Content-Length may be absent or wrong.
-                        'progress' => function ($downloadTotal, $downloaded) use ($maxBytes, &$tooLarge): void {
-                            if ($downloaded > $maxBytes) {
-                                $tooLarge = true;
-                                throw new \RuntimeException('too_large');
-                            }
-                        },
-                        'curl' => [CURLOPT_RESOLVE => ["{$target['host']}:{$target['port']}:".(str_contains($target['ip'], ':') ? "[{$target['ip']}]" : $target['ip'])]],
-                    ])
-                    ->get($current);
-
-                $status = $response->status();
-                if (in_array($status, [301, 302, 303, 307, 308], true)) {
-                    $location = $response->header('Location');
-                    if ($location === '') {
-                        return $this->failure($url, 'redirect_without_location');
-                    }
-                    $current = $this->absoluteUrl($current, $location);
-
-                    continue;
-                }
-
-                if ($status < 200 || $status >= 300) {
-                    return $this->failure($url, "http_{$status}");
-                }
-
-                $contentType = strtolower($response->header('Content-Type'));
-                if ($contentType !== '' && ! str_contains($contentType, 'text/html') && ! str_contains($contentType, 'application/xhtml')) {
-                    return $this->failure($url, 'not_html');
-                }
-
-                $body = $response->body();
-                if ((int) $response->header('Content-Length') > $maxBytes || strlen($body) > $maxBytes) {
-                    return $this->failure($url, 'too_large');
-                }
-
-                return ['fetched' => true, 'error' => null, 'url' => $url, 'final_url' => $current] + $this->extract($body);
-            }
-
-            return $this->failure($url, 'too_many_redirects');
-        } catch (UnsafeUrl $e) {
-            return $this->failure($url, 'unsafe_url');
-        } catch (Throwable $e) {
-            return $this->failure($url, $tooLarge ? 'too_large' : 'fetch_failed');
+        if (! $result->ok()) {
+            return $this->failure($url, $result->error === 'content_type' ? 'not_html' : $result->error);
         }
+
+        return ['fetched' => true, 'error' => null, 'url' => $url, 'final_url' => $result->finalUrl] + $this->extract((string) $result->body);
     }
-
-    /**
-     * @return array{host: string, port: int, ip: string}
-     *
-     * @throws UnsafeUrl
-     */
-    private function validate(string $url): array
-    {
-        $parts = parse_url($url);
-        $scheme = strtolower($parts['scheme'] ?? '');
-        $host = strtolower(rtrim($parts['host'] ?? '', '.'));
-
-        if (! in_array($scheme, ['http', 'https'], true) || $host === '' || isset($parts['user']) || isset($parts['pass'])) {
-            throw new UnsafeUrl;
-        }
-
-        $port = $parts['port'] ?? ($scheme === 'https' ? 443 : 80);
-        if (! in_array($port, [80, 443], true)) {
-            throw new UnsafeUrl;
-        }
-
-        $ips = filter_var(trim($host, '[]'), FILTER_VALIDATE_IP) ? [trim($host, '[]')] : ($this->resolver)($host);
-        if ($ips === []) {
-            throw new UnsafeUrl;
-        }
-        foreach ($ips as $ip) {
-            if (! IpGuard::isPublic($ip)) {
-                throw new UnsafeUrl;
-            }
-        }
-
-        return ['host' => $host, 'port' => $port, 'ip' => $ips[0]];
-    }
-
-    /** @return list<string> */
-    private function resolveDns(string $host): array
-    {
-        $records = @dns_get_record($host, DNS_A | DNS_AAAA) ?: [];
-        $ips = [];
-        foreach ($records as $record) {
-            $ips[] = $record['ip'] ?? $record['ipv6'] ?? null;
-        }
-
-        return array_values(array_filter($ips));
-    }
-
-    private function absoluteUrl(string $base, string $location): string
-    {
-        if (preg_match('#^[a-z][a-z0-9+.-]*://#i', $location)) {
-            return $location;
-        }
-        $parts = parse_url($base);
-        $origin = $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '');
-        if (str_starts_with($location, '//')) {
-            return $parts['scheme'].':'.$location;
-        }
-        if (str_starts_with($location, '/')) {
-            return $origin.$location;
-        }
-        $dir = preg_replace('#/[^/]*$#', '/', $parts['path'] ?? '/');
-
-        return $origin.$dir.$location;
-    }
-
 
     /** @return array<string, mixed> */
     private function failure(string $url, string $error): array
