@@ -110,4 +110,18 @@ class CompetitorExtractorTest extends TestCase
 
         $this->assertSame([], $this->extract([$this->response('openai', $text)]));
     }
+
+    public function test_names_ending_in_romanian_diacritics_survive_quote_trimming(): void
+    {
+        $text = "1. **Clinica Dentară Bucureș** — x\n2. „Atelier Mureș”: y\n3. **Endava** — z";
+
+        $found = $this->extract([$this->response('gemini', $text)]);
+
+        $this->assertArrayHasKey('endava', $found);
+        $names = array_column($found, 'name');
+        $this->assertContains('Clinica Dentară Bucureș', $names);
+        foreach ($names as $name) {
+            $this->assertTrue(mb_check_encoding($name, 'UTF-8'));
+        }
+    }
 }

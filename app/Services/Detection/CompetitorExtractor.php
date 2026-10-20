@@ -115,8 +115,9 @@ class CompetitorExtractor
     private function namesFromText(string $text): array
     {
         $names = [];
+        $text = mb_scrub($text, 'UTF-8');
 
-        foreach (preg_split('/\R/u', $text) as $line) {
+        foreach (preg_split('/\R/u', $text) ?: [] as $line) {
             $line = trim($line);
             if ($line === '') {
                 continue;
@@ -155,9 +156,10 @@ class CompetitorExtractor
         $value = preg_replace('/\[\d+\]|\(\d+\)/u', '', $value);            // citation markers
         $value = preg_replace('/[*_`#]+/u', '', $value);
         $value = preg_replace('/^\d+[.)]\s*/u', '', trim($value));
-        $value = trim($value, " \t\n\r\0\x0B:–—-.,;!?\"'“”‘’()");
+        // trim() is byte-based and would cut multibyte letters such as "ș" in half, so strip by code point.
+        $value = preg_replace('/^[\s:–—\-.,;!?"\'“”‘’()]+|[\s:–—\-.,;!?"\'“”‘’()]+$/u', '', $value);
 
-        return preg_replace('/\s+/u', ' ', $value);
+        return (string) preg_replace('/\s+/u', ' ', (string) $value);
     }
 
     /** @param  list<string>  $brandKeys */

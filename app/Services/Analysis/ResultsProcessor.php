@@ -9,6 +9,7 @@ use App\Models\ApiUsageLog;
 use App\Services\Detection\BrandDetector;
 use App\Services\Detection\CompetitorExtractor;
 use App\Services\Scoring\ScoreCalculator;
+use Throwable;
 
 /** Detection -> competitors -> scoring from stored responses. No provider calls. */
 class ResultsProcessor
@@ -47,7 +48,13 @@ class ResultsProcessor
             ->whereNotIn('ai_response_id', $responses->pluck('id'))
             ->delete();
 
-        $extracted = $this->competitors->extract($responses, $analysis->company_name, $analysis->domain, $variations);
+        // Competitors are supplementary: an extraction bug must not fail an analysis whose answers are fine.
+        try {
+            $extracted = $this->competitors->extract($responses, $analysis->company_name, $analysis->domain, $variations);
+        } catch (Throwable $e) {
+            report($e);
+            $extracted = [];
+        }
         $analysis->competitors()->delete();
         foreach ($extracted as $competitor) {
             $analysis->competitors()->create($competitor);
