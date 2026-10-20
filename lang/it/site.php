@@ -97,10 +97,10 @@ return [
     'platforms' => [
         'title' => 'Testato sugli assistenti che usano i tuoi clienti',
         'items' => [
-            'openai' => 'OpenAI · ricerca web',
-            'gemini' => 'Google · basato sulla Ricerca',
-            'anthropic' => 'Anthropic · ricerca web',
-            'perplexity' => 'Motore di risposte · fonti citate',
+            'openai' => 'Il chatbot più usato',
+            'gemini' => 'Per chi cerca su Google',
+            'anthropic' => 'La scelta dei professionisti',
+            'perplexity' => 'Per chi approfondisce tutto',
         ],
     ],
 

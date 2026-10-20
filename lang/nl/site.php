@@ -97,10 +97,10 @@ return [
     'platforms' => [
         'title' => 'Getest op de assistenten die uw klanten gebruiken',
         'items' => [
-            'openai' => 'OpenAI · webzoekopdrachten',
-            'gemini' => 'Google · gebaseerd op Zoeken',
-            'anthropic' => 'Anthropic · webzoekopdrachten',
-            'perplexity' => 'Antwoordmachine · geciteerde bronnen',
+            'openai' => 'De meestgebruikte chatbot',
+            'gemini' => 'Voor wie zoekt via Google',
+            'anthropic' => 'De keuze van professionals',
+            'perplexity' => 'Voor wie alles grondig uitzoekt',
         ],
     ],
 

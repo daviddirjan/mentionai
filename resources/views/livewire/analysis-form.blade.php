@@ -26,14 +26,14 @@
 
             <div x-data="{ open: @js($errors->hasAny(['industry', 'language'])) }" class="border-t border-line pt-3">
                 <button type="button" x-on:click="open = ! open" x-bind:aria-expanded="open.toString()" aria-controls="more-options"
-                        class="inline-flex items-center gap-1.5 text-sm font-medium text-muted transition hover:text-fg">
+                        class="-mx-1 inline-flex items-center gap-1.5 rounded-lg px-1 py-0.5 text-sm font-medium text-muted transition hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-signal/40">
                     <x-lucide-sliders-horizontal class="size-4" />
                     {{ __('site.form.more_options') }}
                     <x-lucide-chevron-down class="size-4 transition" x-bind:class="open && 'rotate-180'" />
                 </button>
                 <div id="more-options" x-show="open" x-cloak
                      x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
-                     class="mt-4 space-y-4">
+                     class="mt-4 grid gap-4 sm:grid-cols-2">
                     <x-ui.input name="industry" wire:model="industry" :label="__('site.form.industry').' ('.__('site.common.optional').')'" :placeholder="__('site.form.industry_placeholder')" maxlength="120" />
                     <x-ui.select name="language" wire:model.live="language" :label="__('site.form.language')" :options="$languages" required />
                 </div>

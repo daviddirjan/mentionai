@@ -1,5 +1,5 @@
 <section class="relative">
-    <div class="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+    <div class="mx-auto grid max-w-6xl items-start gap-12 px-4 pb-20 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
         <div>
             <p class="eyebrow inline-flex items-center gap-2"><span class="signal-dot" aria-hidden="true"></span>{{ __('site.hero.badge') }}</p>
             <h1 class="mt-5 text-[2.6rem] font-semibold leading-[1.05] text-fg sm:text-6xl">{{ __('site.hero.title') }}</h1>

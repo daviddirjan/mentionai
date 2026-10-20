@@ -97,10 +97,10 @@ return [
     'platforms' => [
         'title' => 'Tested on the assistants your customers use',
         'items' => [
-            'openai' => 'OpenAI · web search',
-            'gemini' => 'Google · Search grounding',
-            'anthropic' => 'Anthropic · web search',
-            'perplexity' => 'Answer engine · cited sources',
+            'openai' => 'The most used chatbot',
+            'gemini' => 'For people who search on Google',
+            'anthropic' => 'The professionals’ choice',
+            'perplexity' => 'For people who research everything',
         ],
     ],
 

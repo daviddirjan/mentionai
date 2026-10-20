@@ -97,10 +97,10 @@ return [
     'platforms' => [
         'title' => 'Testujemy asystentów, z których korzystają Twoi klienci',
         'items' => [
-            'openai' => 'OpenAI · wyszukiwanie w sieci',
-            'gemini' => 'Google · oparte na wyszukiwarce',
-            'anthropic' => 'Anthropic · wyszukiwanie w sieci',
-            'perplexity' => 'Silnik odpowiedzi · cytowane źródła',
+            'openai' => 'Najpopularniejszy chatbot',
+            'gemini' => 'Dla tych, którzy szukają w Google',
+            'anthropic' => 'Wybór profesjonalistów',
+            'perplexity' => 'Dla tych, którzy badają wszystko',
         ],
     ],
 

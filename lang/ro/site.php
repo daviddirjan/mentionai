@@ -97,10 +97,10 @@ return [
     'platforms' => [
         'title' => 'Testăm asistenții pe care îi folosesc clienții tăi',
         'items' => [
-            'openai' => 'OpenAI · căutare web',
-            'gemini' => 'Google · bazat pe Căutare',
-            'anthropic' => 'Anthropic · căutare web',
-            'perplexity' => 'Motor de răspunsuri · surse citate',
+            'openai' => 'Cel mai folosit chatbot',
+            'gemini' => 'Pentru cei care caută pe Google',
+            'anthropic' => 'Alegerea profesioniștilor',
+            'perplexity' => 'Pentru cei care cercetează în detaliu',
         ],
     ],
 
@@ -337,11 +337,11 @@ return [
         'col_chatgpt' => 'ChatGPT obișnuit',
         'col_mentionai' => 'MentionAI GEO Audit',
         'rows' => [
-            ['feature' => '100 AI Visibility Tests', 'chatgpt' => 'Necesită verificări manuale', 'mentionai' => 'Automatizate'],
-            ['feature' => 'Competitor Intelligence', 'chatgpt' => 'Necesită cercetare separată', 'mentionai' => 'Comparație integrată'],
-            ['feature' => 'Technical Website Scanner', 'chatgpt' => 'Limitat fără instrumente externe', 'mentionai' => 'Scanare tehnică automată'],
-            ['feature' => 'Ready-to-Implement Fixes', 'chatgpt' => 'Posibile prin prompting', 'mentionai' => 'Generate din problemele detectate'],
-            ['feature' => 'Before & After Tracking', 'chatgpt' => 'Necesită organizare manuală', 'mentionai' => 'Istoric și comparații automate'],
+            ['feature' => '100 teste de vizibilitate AI', 'chatgpt' => 'Necesită verificări manuale', 'mentionai' => 'Automatizate'],
+            ['feature' => 'Analiza competitorilor', 'chatgpt' => 'Necesită cercetare separată', 'mentionai' => 'Comparație integrată'],
+            ['feature' => 'Scanare tehnică a website-ului', 'chatgpt' => 'Limitat fără instrumente externe', 'mentionai' => 'Scanare tehnică automată'],
+            ['feature' => 'Remedieri gata de implementat', 'chatgpt' => 'Posibile prin prompting', 'mentionai' => 'Generate din problemele detectate'],
+            ['feature' => 'Urmărire înainte și după', 'chatgpt' => 'Necesită organizare manuală', 'mentionai' => 'Istoric și comparații automate'],
         ],
         'cta' => 'Începe cu verificarea gratuită',
     ],
